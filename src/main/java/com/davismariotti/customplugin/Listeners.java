@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.logging.Level;
 
 public class Listeners implements Listener {
 
@@ -49,6 +48,7 @@ public class Listeners implements Listener {
                     e.printStackTrace();
                 }
             }
+            CustomPlugin.instance.getLogger().info(String.format("Emails sent to %d recipient%s", recipients.size(), recipients.size() == 1 ? "" : "s"));
         }
     }
 
