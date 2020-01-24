@@ -1,0 +1,5 @@
+email:
+  excludedPlayers: []
+  recipients:
+    - <Your email>
+  apiKey: <Your Api key here>

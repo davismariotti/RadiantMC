@@ -1,0 +1,14 @@
+name: CustomPlugin
+version: ${project.version}
+author: Davis Mariotti
+main: com.davismariotti.customplugin.CustomPlugin
+
+commands:
+  nick:
+    description: Sets nickname
+  removenick:
+    description: Removes nickname
+  lastlogin:
+    description: Finds who logged in last
+  motd:
+    description: Reads out the motd
