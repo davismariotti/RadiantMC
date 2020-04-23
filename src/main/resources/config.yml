@@ -1,4 +1,5 @@
 email:
+  cooldown: 7200 # In milliseconds
   excludedPlayers: []
   recipients:
     gomeow: <Your email>

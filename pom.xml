@@ -6,7 +6,7 @@
 
     <groupId>com.davismariotti.com</groupId>
     <artifactId>customplugin</artifactId>
-    <version>1.1</version>
+    <version>1.2</version>
     <name>CustomPlugin</name>
     <build>
         <defaultGoal>clean package install</defaultGoal>

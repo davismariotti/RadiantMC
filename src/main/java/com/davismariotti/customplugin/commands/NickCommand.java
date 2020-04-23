@@ -16,15 +16,19 @@ public class NickCommand implements CommandExecutor {
         ChatColor chatColor;
         if (color.length() == 1) {
             chatColor = ChatColor.getByChar(color);
-            if (chatColor == null) {
-                sender.sendMessage("That color is invalid");
+            if (chatColor == null || chatColor == ChatColor.RESET) {
+                sendColorInvalidMessage(sender);
                 return false;
             }
         } else {
             try {
                 chatColor = ChatColor.valueOf(color);
+                if (chatColor == ChatColor.RESET) {
+                    sendColorInvalidMessage(sender);
+                    return false;
+                }
             } catch (IllegalArgumentException e) {
-                sender.sendMessage("That color is invalid");
+                sendColorInvalidMessage(sender);
                 return false;
             }
         }
@@ -55,5 +59,14 @@ public class NickCommand implements CommandExecutor {
             sender.sendMessage("Usage: /nick {color}");
         }
         return true;
+    }
+
+    public void sendColorInvalidMessage(CommandSender sender) {
+        StringBuilder sb = new StringBuilder("That color is invalid. Available colors: ");
+        for (ChatColor color : ChatColor.values()) {
+            if (color == ChatColor.RESET) continue;
+            sb.append(color.toString());
+        }
+        sender.sendMessage(sb.toString());
     }
 }

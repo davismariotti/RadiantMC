@@ -2,6 +2,7 @@ name: CustomPlugin
 version: ${project.version}
 author: Davis Mariotti
 main: com.davismariotti.customplugin.CustomPlugin
+api-version: 1.13
 
 commands:
   nick:
