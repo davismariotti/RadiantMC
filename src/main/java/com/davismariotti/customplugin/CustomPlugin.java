@@ -2,6 +2,7 @@ package com.davismariotti.customplugin;
 
 import com.davismariotti.customplugin.commands.LastLoginCommand;
 import com.davismariotti.customplugin.commands.MotdCommand;
+import com.davismariotti.customplugin.commands.NetherCoordsCommand;
 import com.davismariotti.customplugin.commands.NickCommand;
 import com.davismariotti.customplugin.commands.RemoveNickCommand;
 import com.davismariotti.customplugin.listeners.DeathListener;
@@ -35,6 +36,7 @@ public class CustomPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("nick")).setExecutor(new NickCommand());
         Objects.requireNonNull(getCommand("removenick")).setExecutor(new RemoveNickCommand());
         Objects.requireNonNull(getCommand("lastlogin")).setExecutor(new LastLoginCommand());
+        Objects.requireNonNull(getCommand("nethercoords")).setExecutor(new NetherCoordsCommand());
         Objects.requireNonNull(getCommand("motd")).setExecutor(new MotdCommand());
 
         try {

@@ -13,3 +13,5 @@ commands:
     description: Finds who logged in last
   motd:
     description: Reads out the motd
+  nethercoords:
+    description: Finds the nether or overworld coordinates for your location
