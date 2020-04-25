@@ -1,0 +1,6 @@
+venv
+environment.txt
+.idea
+*.iml
+/__pycache__
+*.pyc
