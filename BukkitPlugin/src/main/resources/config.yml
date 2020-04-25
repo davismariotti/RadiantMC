@@ -1,6 +1,11 @@
 email:
+  enabled: false
   cooldown: 7200 # In milliseconds
   excludedPlayers: []
   recipients:
     gomeow: <Your email>
   apiKey: <Your Api key here>
+
+text:
+  enabled: true
+  loggedInApiUri: <Logged in api uri>
