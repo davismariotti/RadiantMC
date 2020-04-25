@@ -1,7 +1,7 @@
-name: CustomPlugin
+name: RadiantMCPlugin
 version: ${project.version}
 author: Davis Mariotti
-main: com.davismariotti.customplugin.CustomPlugin
+main: com.davismariotti.radiantmc.RadiantMCPlugin
 api-version: 1.13
 
 commands:

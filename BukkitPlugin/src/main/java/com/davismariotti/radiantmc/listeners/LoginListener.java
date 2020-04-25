@@ -1,7 +1,7 @@
-package com.davismariotti.customplugin.listeners;
+package com.davismariotti.radiantmc.listeners;
 
-import com.davismariotti.customplugin.CustomPlugin;
-import com.davismariotti.customplugin.util.SendGridService;
+import com.davismariotti.radiantmc.RadiantMCPlugin;
+import com.davismariotti.radiantmc.util.SendGridService;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -25,7 +25,7 @@ public class LoginListener implements Listener {
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
         try {
-            File file = new File(CustomPlugin.instance.getDataFolder(), "motd.txt");
+            File file = new File(RadiantMCPlugin.instance.getDataFolder(), "motd.txt");
             if (!file.exists()) {
                 file.createNewFile();
             }
@@ -37,7 +37,7 @@ public class LoginListener implements Listener {
         }
 
         // Respect cooldown
-        FileConfiguration configuration = CustomPlugin.instance.getConfig();
+        FileConfiguration configuration = RadiantMCPlugin.instance.getConfig();
         long cooldown = configuration.getLong("email.cooldown", 7200);
         if (System.currentTimeMillis() >= player.getLastPlayed() + cooldown) {
 
@@ -64,11 +64,11 @@ public class LoginListener implements Listener {
                                 service.sendLoggedInEmail((String) recipient.getValue(), player.getName());
                                 sentCount++;
                             } catch (IOException e) {
-                                CustomPlugin.instance.getLogger().warning("There was an exception sending an email.");
+                                RadiantMCPlugin.instance.getLogger().warning("There was an exception sending an email.");
                                 e.printStackTrace();
                             }
                         }
-                        CustomPlugin.instance.getLogger().info(String.format("Emails sent to %d recipient%s", sentCount, sentCount == 1 ? "" : "s"));
+                        RadiantMCPlugin.instance.getLogger().info(String.format("Emails sent to %d recipient%s", sentCount, sentCount == 1 ? "" : "s"));
                     }
                 }
             }

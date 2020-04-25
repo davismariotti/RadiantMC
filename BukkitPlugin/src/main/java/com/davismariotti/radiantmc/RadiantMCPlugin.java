@@ -1,12 +1,12 @@
-package com.davismariotti.customplugin;
+package com.davismariotti.radiantmc;
 
-import com.davismariotti.customplugin.commands.LastLoginCommand;
-import com.davismariotti.customplugin.commands.MotdCommand;
-import com.davismariotti.customplugin.commands.NetherCoordsCommand;
-import com.davismariotti.customplugin.commands.NickCommand;
-import com.davismariotti.customplugin.commands.RemoveNickCommand;
-import com.davismariotti.customplugin.listeners.DeathListener;
-import com.davismariotti.customplugin.listeners.LoginListener;
+import com.davismariotti.radiantmc.commands.LastLoginCommand;
+import com.davismariotti.radiantmc.commands.MotdCommand;
+import com.davismariotti.radiantmc.commands.NetherCoordsCommand;
+import com.davismariotti.radiantmc.commands.NickCommand;
+import com.davismariotti.radiantmc.commands.RemoveNickCommand;
+import com.davismariotti.radiantmc.listeners.DeathListener;
+import com.davismariotti.radiantmc.listeners.LoginListener;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -16,12 +16,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class CustomPlugin extends JavaPlugin {
+public class RadiantMCPlugin extends JavaPlugin {
 
-    public static CustomPlugin instance;
+    public static RadiantMCPlugin instance;
     private List<Listener> listeners = new ArrayList<>();
 
-    public CustomPlugin() {
+    public RadiantMCPlugin() {
         instance = this;
         listeners.add(new LoginListener());
         listeners.add(new DeathListener());
@@ -40,7 +40,7 @@ public class CustomPlugin extends JavaPlugin {
         Objects.requireNonNull(getCommand("motd")).setExecutor(new MotdCommand());
 
         try {
-            File file = new File(CustomPlugin.instance.getDataFolder(), "motd.txt");
+            File file = new File(RadiantMCPlugin.instance.getDataFolder(), "motd.txt");
             if (!file.exists()) {
                 file.createNewFile();
             }

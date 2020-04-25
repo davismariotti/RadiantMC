@@ -1,6 +1,6 @@
-package com.davismariotti.customplugin.commands;
+package com.davismariotti.radiantmc.commands;
 
-import com.davismariotti.customplugin.CustomPlugin;
+import com.davismariotti.radiantmc.RadiantMCPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -14,7 +14,7 @@ public class MotdCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         try {
-            File file = new File(CustomPlugin.instance.getDataFolder(), "motd.txt");
+            File file = new File(RadiantMCPlugin.instance.getDataFolder(), "motd.txt");
             if (!file.exists()) {
                 file.createNewFile();
             }

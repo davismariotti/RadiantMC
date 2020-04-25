@@ -1,4 +1,4 @@
-package com.davismariotti.customplugin.util;
+package com.davismariotti.radiantmc.util;
 
 import com.sendgrid.Method;
 import com.sendgrid.Request;

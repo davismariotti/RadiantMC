@@ -4,10 +4,10 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.davismariotti.com</groupId>
-    <artifactId>customplugin</artifactId>
-    <version>1.2</version>
-    <name>CustomPlugin</name>
+    <groupId>davismariotti.com</groupId>
+    <artifactId>radiantmc</artifactId>
+    <version>1.3</version>
+    <name>RadiantMCPlugin</name>
     <build>
         <defaultGoal>clean package install</defaultGoal>
         <finalName>${project.name}</finalName>
@@ -36,7 +36,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.davismariotti.customplugin.CustomPlugin</mainClass>
+                            <mainClass>com.davismariotti.radiantmc.RadiantMCPlugin</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

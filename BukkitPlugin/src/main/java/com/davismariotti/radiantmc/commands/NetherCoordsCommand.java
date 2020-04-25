@@ -1,4 +1,4 @@
-package com.davismariotti.customplugin.commands;
+package com.davismariotti.radiantmc.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;

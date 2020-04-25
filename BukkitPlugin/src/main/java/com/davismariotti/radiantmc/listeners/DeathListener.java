@@ -1,6 +1,6 @@
-package com.davismariotti.customplugin.listeners;
+package com.davismariotti.radiantmc.listeners;
 
-import com.davismariotti.customplugin.CustomPlugin;
+import com.davismariotti.radiantmc.RadiantMCPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -25,7 +25,7 @@ public class DeathListener implements Listener {
             skull.setItemMeta(meta);
 
             World world = player.getWorld();
-            Bukkit.getScheduler().runTaskLater(CustomPlugin.instance, () -> {
+            Bukkit.getScheduler().runTaskLater(RadiantMCPlugin.instance, () -> {
                 world.dropItemNaturally(player.getLocation(), skull);
             }, 20L);
         }

@@ -1,6 +1,6 @@
-package com.davismariotti.customplugin.commands;
+package com.davismariotti.radiantmc.commands;
 
-import com.davismariotti.customplugin.CustomPlugin;
+import com.davismariotti.radiantmc.RadiantMCPlugin;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -35,7 +35,7 @@ public class LastLoginCommand implements CommandExecutor {
     @Override
     public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
         List<LoginData> loginDataList = new ArrayList<>();
-        for (OfflinePlayer offlinePlayer : CustomPlugin.instance.getServer().getOfflinePlayers()) {
+        for (OfflinePlayer offlinePlayer : RadiantMCPlugin.instance.getServer().getOfflinePlayers()) {
             loginDataList.add(new LoginData(offlinePlayer.getName(), offlinePlayer.getLastPlayed()));
         }
         loginDataList.sort(Comparator.comparing(LoginData::getLoginTime));
