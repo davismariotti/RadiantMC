@@ -1,5 +1,5 @@
 import re
-
+import json
 from flask import Blueprint, request
 from sqlalchemy import or_
 
@@ -48,10 +48,26 @@ def create_mobile():
     if check_if_mobile_or_username_exists(mobile, minecraft_username):
         return create_error('There is already a record with that mobile/username.')
 
-    mobile_rec = Mobile(mobile=mobile, minecraft_username=minecraft_username)
+    mobile_rec = Mobile(mobile=mobile, minecraft_username=minecraft_username, time_slots=[])
     db.session.add(mobile_rec)
     db.session.commit()
     return convert_mobile(mobile_rec)
+
+
+@mobile_api.route('/time_slots/<phone>/update', methods=['POST'])
+def update_time_slots(phone):
+    mobile_rec = Mobile.query.filter(Mobile.mobile == phone).first_or_404()
+    req_json = request.get_json()
+    if req_json is None or 'time_slots' not in req_json:
+        return create_error('There were no time slots supplied.')
+
+    time_slots = req_json['time_slots']
+    print(time_slots)
+
+    mobile_rec.time_slots = json.dumps(time_slots)
+    db.session.commit()
+
+    return create_success(convert_mobile(mobile_rec))
 
 
 @mobile_api.route('/mobile/list')
@@ -64,7 +80,8 @@ def convert_mobile(mobile):
     return {
         'id': mobile.id,
         'mobile': mobile.mobile,
-        'minecraft_username': mobile.minecraft_username
+        'minecraft_username': mobile.minecraft_username,
+        'time_slots': json.loads(mobile.time_slots)
     }
 
 

@@ -1,11 +1,12 @@
 from flask import Blueprint, request
 from sqlalchemy import and_
 from twilio.rest import Client
-
 from models import Mobile
 from utils import create_success, check_token
 import os
-
+import datetime
+import pytz
+import json
 
 auth_token = os.environ['AUTH_TOKEN']
 account_sid = os.environ['ACCOUNT_SID']
@@ -25,16 +26,36 @@ def send(username):
     if req_json is not None and 'excludedPlayers' in req_json:
         excluded_players = req_json['excludedPlayers']
 
-    mobile_records = Mobile.query.filter(and_(Mobile.minecraft_username.notin_(excluded_players), Mobile.minecraft_username != username)).all()
+    mobile_records = Mobile.query.filter(and_(Mobile.minecraft_username.notin_(excluded_players),
+                                              Mobile.minecraft_username != username)).all()
 
+    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone("America/Los_Angeles"))
+    weekday = now.weekday()
+    hour = now.hour
     messages = []
     for mobile_record in mobile_records:
-        messages.append(client.messages.create(
-            body="%s logged in" % username,
-            from_=from_phone_number,
-            to=mobile_record.mobile
-        ))
+        time_slots = json.loads(mobile_record.time_slots)
+        if is_inside_valid_time_slot(time_slots, weekday, hour):
+            messages.append(client.messages.create(
+                body="%s logged in" % username,
+                from_=from_phone_number,
+                to=mobile_record.mobile
+            ))
     return create_success(list(map(convert_message, messages)))
+
+
+def is_inside_valid_time_slot(time_slots, weekday, hour):
+    for day_slot in time_slots:
+        day = day_slot["day"]
+        if weekday != day:
+            continue
+        hour_slots = day_slot["slots"]
+        for hour_slot in hour_slots:
+            start_hour = hour_slot['start_time']
+            end_hour = hour_slot['end_time']
+            if start_hour <= hour < end_hour:
+                return True
+    return False
 
 
 def convert_message(message):
@@ -44,7 +65,3 @@ def convert_message(message):
         "to": message.to,
         "date_created": message.date_created
     }
-
-
-if __name__ == '__main__':
-    pass
