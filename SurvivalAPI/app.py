@@ -3,7 +3,6 @@ import os
 from MobileAPI import mobile_api
 from extensions import db
 
-api_key = os.environ['API_KEY']
 database_url = os.environ['DATABASE_URL']
 
 app = Flask(__name__)

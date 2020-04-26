@@ -1,10 +1,11 @@
 from flask import jsonify, request, abort
+import os
 
-from app import api_key
+api_key = os.environ['API_KEY']
 
 
-def create_errors(errors):
-    return jsonify({"errors": errors, "status": "error"})
+def create_error(error):
+    return jsonify({"error": error, "status": "error"})
 
 
 def create_success(payload):

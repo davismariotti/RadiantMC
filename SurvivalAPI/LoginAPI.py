@@ -1,6 +1,6 @@
 from flask import Blueprint, request
 from twilio.rest import Client
-from utils import create_success, create_errors, check_token
+from utils import create_success, create_error, check_token
 import os
 
 
@@ -18,10 +18,10 @@ def send(phone):
     check_token()
     req_json = request.get_json()
     if req_json is None or 'logged_in_name' not in req_json:
-        return create_errors(['There was no player name supplied'])
+        return create_error('There was no player name supplied')
     logged_in_name = req_json['logged_in_name']
     if len(phone) != 10:
-        return create_errors(['The phone number must be 10 digits long'])
+        return create_error('The phone number must be 10 digits long')
 
     message = client.messages \
         .create(
