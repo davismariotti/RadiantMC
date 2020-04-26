@@ -1,5 +1,7 @@
 from flask import Flask
 import os
+
+from LoginAPI import login_api
 from MobileAPI import mobile_api
 from extensions import db
 
@@ -7,6 +9,7 @@ database_url = os.environ['DATABASE_URL']
 
 app = Flask(__name__)
 app.register_blueprint(mobile_api)
+app.register_blueprint(login_api)
 app.config.update(
     SQLALCHEMY_DATABASE_URI=database_url,
     SQLALCHEMY_TRACK_MODIFICATIONS=False

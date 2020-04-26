@@ -8,4 +8,4 @@ email:
 
 text:
   enabled: true
-  loggedInApiUri: <Logged in api uri>
+  apiUrl: <api uri>

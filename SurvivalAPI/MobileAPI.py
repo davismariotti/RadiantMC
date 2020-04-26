@@ -15,7 +15,22 @@ def validate_phone_number(mobile):
 
 
 def check_if_mobile_or_username_exists(mobile, minecraft_username):
-    return db.session.query(Mobile.minecraft_username).filter(or_(Mobile.mobile == mobile, Mobile.minecraft_username == minecraft_username)).count() > 0
+    return db.session.query(Mobile.minecraft_username).filter(
+        or_(Mobile.mobile == mobile, Mobile.minecraft_username == minecraft_username)).count() > 0
+
+
+@mobile_api.route('/mobile/<phone>', methods=['GET'])
+def get_phone(phone):
+    mobile_rec = Mobile.query.filter(Mobile.mobile == phone).first_or_404()
+
+    return create_success(convert_mobile(mobile_rec))
+
+
+@mobile_api.route('/username/<username>', methods=['GET'])
+def get_username(username):
+    mobile_rec = Mobile.query.filter(Mobile.minecraft_username == username).first_or_404()
+
+    return create_success(convert_mobile(mobile_rec))
 
 
 @mobile_api.route('/mobile/new', methods=['POST'])

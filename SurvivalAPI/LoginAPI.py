@@ -1,6 +1,9 @@
 from flask import Blueprint, request
+from sqlalchemy import and_
 from twilio.rest import Client
-from utils import create_success, create_error, check_token
+
+from models import Mobile
+from utils import create_success, check_token
 import os
 
 
@@ -13,23 +16,25 @@ login_api = Blueprint('login_api', __name__)
 client = Client(account_sid, auth_token)
 
 
-@login_api.route('/send/<phone>', methods=['POST'])
-def send(phone):
+@login_api.route('/login/<username>', methods=['POST'])
+def send(username):
     check_token()
-    req_json = request.get_json()
-    if req_json is None or 'logged_in_name' not in req_json:
-        return create_error('There was no player name supplied')
-    logged_in_name = req_json['logged_in_name']
-    if len(phone) != 10:
-        return create_error('The phone number must be 10 digits long')
 
-    message = client.messages \
-        .create(
-        body="%s logged in" % logged_in_name,
-        from_=from_phone_number,
-        to='+1%s' % phone
-    )
-    return create_success(convert_message(message))
+    excluded_players = []
+    req_json = request.get_json()
+    if req_json is not None and 'excludedPlayers' in req_json:
+        excluded_players = req_json['excludedPlayers']
+
+    mobile_records = Mobile.query.filter(and_(Mobile.minecraft_username.notin_(excluded_players), Mobile.minecraft_username != username)).all()
+
+    messages = []
+    for mobile_record in mobile_records:
+        messages.append(client.messages.create(
+            body="%s logged in" % username,
+            from_=from_phone_number,
+            to=mobile_record.mobile
+        ))
+    return create_success(list(map(convert_message, messages)))
 
 
 def convert_message(message):

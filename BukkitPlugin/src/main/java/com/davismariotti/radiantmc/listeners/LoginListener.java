@@ -1,6 +1,7 @@
 package com.davismariotti.radiantmc.listeners;
 
 import com.davismariotti.radiantmc.RadiantMCPlugin;
+import com.davismariotti.radiantmc.util.LoginApiService;
 import com.davismariotti.radiantmc.util.SendGridService;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -18,6 +19,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class LoginListener implements Listener {
 
@@ -38,40 +40,56 @@ public class LoginListener implements Listener {
 
         // Respect cooldown
         FileConfiguration configuration = RadiantMCPlugin.instance.getConfig();
-        long cooldown = configuration.getLong("email.cooldown", 7200);
-        if (System.currentTimeMillis() >= player.getLastPlayed() + cooldown) {
+        boolean emailEnabled = configuration.getBoolean("email.enabled", false);
 
-            // Check the time
-            ZoneId id = ZoneId.of("America/Los_Angeles");
-            ZonedDateTime zdt = ZonedDateTime.now(id);
-            if (zdt.getHour() <= 23 && zdt.getHour() >= 7) {
+        if (emailEnabled) {
+            long cooldown = configuration.getLong("email.cooldown", 7200);
+            if (System.currentTimeMillis() >= player.getLastPlayed() + cooldown) {
 
-                // Find excluded
-                List<String> excludedPlayers = configuration.getStringList("email.excludedPlayers");
-                if (!excludedPlayers.contains(player.getName())) {
-                    String apiKey = configuration.getString("email.apiKey");
-                    ConfigurationSection configurationSection = configuration.getConfigurationSection("email.recipients");
-                    if (configurationSection != null) {
-                        Map<String, Object> recipients = configurationSection.getValues(false);
-                        SendGridService service = new SendGridService(apiKey);
-                        int sentCount = 0;
-                        for (Map.Entry<String, Object> recipient : recipients.entrySet()) {
-                            String recipientName = recipient.getKey();
-                            if (recipientName.equals(player.getName())) continue;
-                            if (Bukkit.getServer().getOnlinePlayers().stream().anyMatch(p -> p.getName().equals(recipientName))) continue;
+                // Check the time
+                ZoneId id = ZoneId.of("America/Los_Angeles");
+                ZonedDateTime zdt = ZonedDateTime.now(id);
+                if (zdt.getHour() <= 23 && zdt.getHour() >= 7) {
 
-                            try {
-                                service.sendLoggedInEmail((String) recipient.getValue(), player.getName());
-                                sentCount++;
-                            } catch (IOException e) {
-                                RadiantMCPlugin.instance.getLogger().warning("There was an exception sending an email.");
-                                e.printStackTrace();
+                    // Find excluded
+                    List<String> excludedPlayers = configuration.getStringList("email.excludedPlayers");
+                    if (!excludedPlayers.contains(player.getName())) {
+                        String apiKey = configuration.getString("email.apiKey");
+                        ConfigurationSection configurationSection = configuration.getConfigurationSection("email.recipients");
+                        if (configurationSection != null) {
+                            Map<String, Object> recipients = configurationSection.getValues(false);
+                            SendGridService service = new SendGridService(apiKey);
+                            int sentCount = 0;
+                            for (Map.Entry<String, Object> recipient : recipients.entrySet()) {
+                                String recipientName = recipient.getKey();
+                                if (recipientName.equals(player.getName())) continue;
+                                if (Bukkit.getServer().getOnlinePlayers().stream().anyMatch(p -> p.getName().equals(recipientName))) continue;
+
+                                try {
+                                    service.sendLoggedInEmail((String) recipient.getValue(), player.getName());
+                                    sentCount++;
+                                } catch (IOException e) {
+                                    RadiantMCPlugin.instance.getLogger().warning("There was an exception sending an email.");
+                                    e.printStackTrace();
+                                }
                             }
+                            RadiantMCPlugin.instance.getLogger().info(String.format("Emails sent to %d recipient%s", sentCount, sentCount == 1 ? "" : "s"));
                         }
-                        RadiantMCPlugin.instance.getLogger().info(String.format("Emails sent to %d recipient%s", sentCount, sentCount == 1 ? "" : "s"));
                     }
                 }
             }
+        }
+
+        boolean textEnabled = configuration.getBoolean("text.enabled", false);
+        if (textEnabled) {
+            Bukkit.getScheduler().runTaskAsynchronously(RadiantMCPlugin.instance, () -> {
+                LoginApiService service = new LoginApiService();
+                try {
+                    service.postPlayerLoggedIn(player.getName(), Bukkit.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            });
         }
     }
 
