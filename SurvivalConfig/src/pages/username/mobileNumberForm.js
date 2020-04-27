@@ -24,7 +24,7 @@ export default function MobileNumberForm(props) {
                   variant="outlined"
                   name="mobile"
                   value={values.mobile}
-                  error={errors.mobile}
+                  error={!!errors.mobile}
                   helperText={errors.mobile}
                 />
               )}

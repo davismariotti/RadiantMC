@@ -29,7 +29,7 @@ export default function UserNameForm(props) {
               onChange={handleChange}
               onBlur={handleBlur}
               value={values.username}
-              error={errors.username}
+              error={!!errors.username}
               helperText={errors.username}
             />
             <Button color="primary" variant="contained" style={{ marginLeft: 16 }} type="submit">

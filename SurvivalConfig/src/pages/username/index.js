@@ -145,16 +145,16 @@ export default function UsernamePage() {
     setSelected(copy)
   }
 
+  if (error) {
+    return <div>{error.toString()}</div>
+  }
+
   if (!data) {
     return (
       <PageWrapper>
         <CircularProgress style={{ marginTop: 150 }} />
       </PageWrapper>
     )
-  }
-
-  if (error) {
-    return <div>{error.toString()}</div>
   }
 
   return (
