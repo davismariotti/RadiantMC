@@ -20,13 +20,17 @@ const useStyles = makeStyles(theme => ({
     justifyContent: 'space-evenly',
   },
   paper: {
-    height: 300,
     display: 'flex',
     flexDirection: 'column',
     marginTop: 32,
   },
   paperContent: {
     padding: 20,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  hourBoxContainer: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
@@ -41,6 +45,9 @@ const useStyles = makeStyles(theme => ({
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: props => (props.active ? theme.palette.primary.main : ''),
+  },
+  updateTimeSlotsButton: {
+    marginTop: 32,
   },
 }))
 
@@ -127,7 +134,7 @@ export default function UsernamePage() {
   const [updateMobileNumber] = useUpdateMobileNumber(id)
 
   const handleSubmitMobileNumberChange = values => {
-    updateMobileNumber({ mobile: `+1${values.mobile}` }).then(refetch)
+    updateMobileNumber({ mobile: `+1${values.mobile.replace(/\D/g, '')}` }).then(refetch)
   }
 
   const handleUpdateTimeSlots = () => {
@@ -157,6 +164,13 @@ export default function UsernamePage() {
     )
   }
 
+  const hours = _.chunk(
+    _.times(24, i => (
+      <HourBox key={i} hour={i} value={selected[day].selected[i]} handleChange={value => handleChange(i, value)} />
+    )),
+    12
+  )
+
   return (
     <PageWrapper>
       Editing {data.minecraft_username}
@@ -167,7 +181,7 @@ export default function UsernamePage() {
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            height: 100,
+            padding: 20,
           }}
           elevation={2}
         >
@@ -187,16 +201,14 @@ export default function UsernamePage() {
             ))}
           </Tabs>
           <div className={classes.paperContent}>
-            {_.times(24, i => (
-              <HourBox
-                key={i}
-                hour={i}
-                value={selected[day].selected[i]}
-                handleChange={value => handleChange(i, value)}
-              />
-            ))}
-
-            <Button color="primary" variant="contained" onClick={handleUpdateTimeSlots}>
+            <div className={classes.hourBoxContainer}>{hours[0]}</div>
+            <div className={classes.hourBoxContainer}>{hours[1]}</div>
+            <Button
+              color="primary"
+              variant="contained"
+              onClick={handleUpdateTimeSlots}
+              className={classes.updateTimeSlotsButton}
+            >
               Update Time Slots
             </Button>
           </div>

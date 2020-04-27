@@ -15,7 +15,7 @@ export default function MobileNumberForm(props) {
     >
       {({ values, errors, handleChange }) => (
         <Form>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <InputMask mask="(999) 999-9999" value={values.mobile} onChange={handleChange} maskChar=" ">
               {() => (
                 <TextField
@@ -29,10 +29,10 @@ export default function MobileNumberForm(props) {
                 />
               )}
             </InputMask>
-            <Button color="primary" variant="contained" style={{ marginLeft: 16 }} type="submit">
-              Change phone number
-            </Button>
           </div>
+          <Button color="primary" variant="contained" style={{ marginTop: 32 }} type="submit">
+            Change phone number
+          </Button>
         </Form>
       )}
     </Formik>

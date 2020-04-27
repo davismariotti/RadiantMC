@@ -13,14 +13,20 @@ export default function useLazyGetAPI(options) {
     setLoading(true)
     return API.get(endpoint)
       .then(response => {
+        const error = _.get(response, 'data.error')
+        if (error) {
+          setError(error)
+          return Promise.reject(error)
+        }
+
         const payload = _.get(response, 'data.payload')
         if (payload) {
           setData(payload)
-          setLoading(false)
           if (onCompleted) {
             onCompleted(payload)
           }
         }
+        setLoading(false)
         return Promise.resolve(payload)
       })
       .catch(error => {

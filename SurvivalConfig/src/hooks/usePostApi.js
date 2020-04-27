@@ -11,8 +11,12 @@ export default function usePostAPI(endpoint) {
       ...data,
     })
       .then(response => {
-        const payload = _.get(response, 'data.payload')
         setLoading(false)
+        const error = _.get(response, 'data.error')
+        if (error) {
+          return Promise.reject(error)
+        }
+        const payload = _.get(response, 'data.payload')
         return Promise.resolve(payload)
       })
       .catch(error => {

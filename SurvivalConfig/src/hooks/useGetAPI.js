@@ -13,14 +13,16 @@ export default function useGetAPI(endpoint, { onCompleted, onError }) {
     setLoading(true)
     API.get(endpoint)
       .then(response => {
+        setError(_.get(response, 'data.error'))
+
         const payload = _.get(response, 'data.payload')
         if (payload) {
           setData(payload)
-          setLoading(false)
           if (onCompleted) {
             onCompleted(payload)
           }
         }
+        setLoading(false)
       })
       .catch(error => {
         setError(error)
