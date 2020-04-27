@@ -26,6 +26,13 @@ def get_phone(phone):
     return create_success(convert_mobile(mobile_rec))
 
 
+@mobile_api.route('/user/<mobile_id>', methods=['GET'])
+def get_id(mobile_id):
+    mobile_rec = Mobile.query.filter(Mobile.id == mobile_id).first_or_404()
+
+    return create_success(convert_mobile(mobile_rec))
+
+
 @mobile_api.route('/username/<username>', methods=['GET'])
 def get_username(username):
     mobile_rec = Mobile.query.filter(Mobile.minecraft_username == username).first_or_404()
@@ -54,9 +61,9 @@ def create_mobile():
     return convert_mobile(mobile_rec)
 
 
-@mobile_api.route('/time_slots/<phone>/update', methods=['POST'])
-def update_time_slots(phone):
-    mobile_rec = Mobile.query.filter(Mobile.mobile == phone).first_or_404()
+@mobile_api.route('/time_slots/<mobile_id>/update', methods=['POST'])
+def update_time_slots(mobile_id):
+    mobile_rec = Mobile.query.filter(Mobile.id == mobile_id).first_or_404()
     req_json = request.get_json()
     if req_json is None or 'time_slots' not in req_json:
         return create_error('There were no time slots supplied.')
