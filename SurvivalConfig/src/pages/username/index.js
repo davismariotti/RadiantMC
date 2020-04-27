@@ -84,11 +84,11 @@ const formatSlots = selectedHours => {
     }
     if (currentStart !== undefined) {
       if (!value) {
-        slots.push({ startHour: currentStart, endHour: index })
+        slots.push({ start_time: currentStart, end_time: index })
         currentStart = undefined
       }
       if (value && index === 23) {
-        slots.push({ startHour: currentStart, endHour: 24 })
+        slots.push({ start_time: currentStart, end_time: 24 })
       }
     }
   }
@@ -100,9 +100,9 @@ const deconstructSlots = days => {
   for (let day of days) {
     const hours = _.times(24, () => false)
     for (let slot of day.slots) {
-      const startHour = slot.startHour
-      const endHour = slot.endHour
-      _.range(startHour, endHour).forEach(i => (hours[i] = true))
+      const start_time = slot.start_time
+      const end_time = slot.end_time
+      _.range(start_time, end_time).forEach(i => (hours[i] = true))
     }
     selected.push({
       day: day.day,
