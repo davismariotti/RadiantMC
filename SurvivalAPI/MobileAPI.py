@@ -61,6 +61,21 @@ def create_mobile():
     return convert_mobile(mobile_rec)
 
 
+@mobile_api.route('/user/<mobile_id>/updatemobile', methods=['POST'])
+def update_mobile(mobile_id):
+    mobile_rec = Mobile.query.filter(Mobile.id == mobile_id).first_or_404()
+
+    req_json = request.get_json()
+    if req_json is None or 'mobile' not in req_json:
+        return create_error('There was no mobile supplied.')
+    mobile = req_json['mobile']
+
+    mobile_rec.mobile = mobile
+    db.session.commit()
+
+    return create_success(convert_mobile(mobile_rec))
+
+
 @mobile_api.route('/time_slots/<mobile_id>/update', methods=['POST'])
 def update_time_slots(mobile_id):
     mobile_rec = Mobile.query.filter(Mobile.id == mobile_id).first_or_404()

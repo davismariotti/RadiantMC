@@ -7,8 +7,8 @@ export default function usePostAPI(endpoint) {
 
   const post = data => {
     setLoading(true)
-    API.post(endpoint, {
-      data,
+    return API.post(endpoint, {
+      ...data,
     })
       .then(response => {
         const payload = _.get(response, 'data.payload')

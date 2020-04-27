@@ -12,7 +12,7 @@ function App() {
       <MainContainer>
         <Navbar />
         <Route path="/" component={MainPage} exact />
-        <Route path="/username/:username" component={UsernamePage} exact />
+        <Route path="/user/:id" component={UsernamePage} exact />
       </MainContainer>
     </BrowserRouter>
   )

@@ -7,7 +7,6 @@ export default function MainPage() {
   const history = useHistory()
 
   const handleSubmit = values => {
-    console.log('values', values)
     history.push(`/username/${values.username}`)
   }
 

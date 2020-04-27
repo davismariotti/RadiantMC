@@ -1,3 +1,4 @@
+import Button from '@material-ui/core/Button'
 import CircularProgress from '@material-ui/core/CircularProgress'
 import Paper from '@material-ui/core/Paper'
 import { makeStyles } from '@material-ui/core/styles'
@@ -6,10 +7,13 @@ import Tabs from '@material-ui/core/Tabs'
 import _ from 'lodash'
 import React, { useState } from 'react'
 import { useParams } from 'react-router'
+import useUpdateMobileNumber from '../../hooks/useUpdateMobileNumber'
 import useUpdateTimeSlots from '../../hooks/useUpdateTimeSlots'
 import useUsernameRecord from '../../hooks/useUsernameRecord'
 import { PageWrapper } from '../styles'
 import MobileNumberForm from './mobileNumberForm'
+
+const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
 const useStyles = makeStyles(theme => ({
   tabs: {
@@ -84,13 +88,48 @@ const formatSlots = selectedHours => {
   return slots
 }
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+//        "time_slots": [
+//             {
+//                 "day": 0,
+//                 "slots": [
+//                     {
+//                         "endHour": 23,
+//                         "startHour": 7
+//                     }
+//                 ]
+//             },
+//             {
+//                 "day": 1,
+//                 "slots": [
+//                     {
+//                         "endHour": 23,
+//                         "startHour": 7
+//                     }
+//                 ]
+//              }
+//         ]
+//     }
+
+const deconstructSlots = days => {
+  const selected = []
+  for (let day of days) {
+    const hours = _.times(24, () => false)
+    for (let slot of day.slots) {
+      const startHour = slot.startHour
+      const endHour = slot.endHour
+      _.range(startHour, endHour).forEach(i => (hours[i] = true))
+    }
+    selected.push({
+      day: day.day,
+      selected: hours,
+    })
+  }
+
+  return selected
+}
 
 export default function UsernamePage() {
-  const { username } = useParams()
-
-  const { data, loading, error } = useUsernameRecord(username)
-  const [updateTimeSlots, { loading: processingUpdateTimeSlots }] = useUpdateTimeSlots(5)
+  const { id } = useParams()
 
   const classes = useStyles()
   const [day, setDay] = useState(0)
@@ -101,13 +140,34 @@ export default function UsernamePage() {
     }))
   )
 
+  const { data, error, refetch } = useUsernameRecord(id, {
+    onCompleted: data => {
+      setSelected(deconstructSlots(data.time_slots))
+    },
+  })
+  const [updateTimeSlots] = useUpdateTimeSlots(id)
+  const [updateMobileNumber] = useUpdateMobileNumber(id)
+
+  const handleSubmitMobileNumberChange = values => {
+    updateMobileNumber({ mobile: `+1${values.mobile}` }).then(refetch)
+  }
+
+  const handleUpdateTimeSlots = () => {
+    updateTimeSlots({
+      time_slots: selected.map((value, idx) => ({
+        day: value.day,
+        slots: formatSlots(value.selected),
+      })),
+    }).then(refetch)
+  }
+
   const handleChange = (hour, value) => {
     const copy = _.cloneDeep(selected)
-    copy[day][hour] = value
+    copy[day].selected[hour] = value
     setSelected(copy)
   }
 
-  if (loading) {
+  if (!data) {
     return (
       <PageWrapper>
         <CircularProgress style={{ marginTop: 150 }} />
@@ -118,10 +178,6 @@ export default function UsernamePage() {
   if (error) {
     return <div>{error.toString()}</div>
   }
-
-  console.log('loading', loading)
-  console.log('error', error)
-  console.log('data', data)
 
   return (
     <PageWrapper>
@@ -137,7 +193,7 @@ export default function UsernamePage() {
           }}
           elevation={2}
         >
-          <MobileNumberForm handleSubmit={console.log} initialPhoneNumber={data.mobile} />
+          <MobileNumberForm handleSubmit={handleSubmitMobileNumberChange} initialPhoneNumber={data.mobile} />
         </Paper>
         <Paper square className={classes.paper} elevation={2}>
           <Tabs
@@ -154,8 +210,17 @@ export default function UsernamePage() {
           </Tabs>
           <div className={classes.paperContent}>
             {_.times(24, i => (
-              <HourBox key={i} hour={i} value={selected[day][i]} handleChange={value => handleChange(i, value)} />
+              <HourBox
+                key={i}
+                hour={i}
+                value={selected[day].selected[i]}
+                handleChange={value => handleChange(i, value)}
+              />
             ))}
+
+            <Button color="primary" variant="contained" onClick={handleUpdateTimeSlots}>
+              Update Time Slots
+            </Button>
           </div>
         </Paper>
       </div>
