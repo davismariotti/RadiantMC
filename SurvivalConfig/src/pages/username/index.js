@@ -6,6 +6,7 @@ import Tabs from '@material-ui/core/Tabs'
 import _ from 'lodash'
 import React, { useState } from 'react'
 import { useParams } from 'react-router'
+import useUpdateTimeSlots from '../../hooks/useUpdateTimeSlots'
 import useUsernameRecord from '../../hooks/useUsernameRecord'
 import { PageWrapper } from '../styles'
 
@@ -87,6 +88,7 @@ export default function UsernamePage() {
   const { username } = useParams()
 
   const { data, loading, error } = useUsernameRecord(username)
+  const [updateTimeSlots, { loading: processingUpdateTimeSlots }] = useUpdateTimeSlots(5)
 
   const classes = useStyles()
   const [day, setDay] = useState(0)

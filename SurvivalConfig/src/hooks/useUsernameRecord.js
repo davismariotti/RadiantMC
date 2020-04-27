@@ -1,6 +1,6 @@
 import { HttpMethod } from './httpMethod'
-import useAPI from './useApi'
+import useGetAPI from './useGetAPI'
 
 export default function useUsernameRecord(username) {
-  return useAPI(`username/${username}`, HttpMethod.get)
+  return useGetAPI(`username/${username}`, HttpMethod.get)
 }
