@@ -88,28 +88,6 @@ const formatSlots = selectedHours => {
   return slots
 }
 
-//        "time_slots": [
-//             {
-//                 "day": 0,
-//                 "slots": [
-//                     {
-//                         "endHour": 23,
-//                         "startHour": 7
-//                     }
-//                 ]
-//             },
-//             {
-//                 "day": 1,
-//                 "slots": [
-//                     {
-//                         "endHour": 23,
-//                         "startHour": 7
-//                     }
-//                 ]
-//              }
-//         ]
-//     }
-
 const deconstructSlots = days => {
   const selected = []
   for (let day of days) {
