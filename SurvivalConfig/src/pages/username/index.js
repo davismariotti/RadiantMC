@@ -9,6 +9,7 @@ import { useParams } from 'react-router'
 import useUpdateTimeSlots from '../../hooks/useUpdateTimeSlots'
 import useUsernameRecord from '../../hooks/useUsernameRecord'
 import { PageWrapper } from '../styles'
+import MobileNumberForm from './mobileNumberForm'
 
 const useStyles = makeStyles(theme => ({
   tabs: {
@@ -18,6 +19,7 @@ const useStyles = makeStyles(theme => ({
     height: 300,
     display: 'flex',
     flexDirection: 'column',
+    marginTop: 32,
   },
   paperContent: {
     padding: 20,
@@ -125,7 +127,19 @@ export default function UsernamePage() {
     <PageWrapper>
       Editing {data.minecraft_username}
       <div style={{ marginTop: 100 }}>
-        <Paper square className={classes.paper}>
+        <Paper
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: 100,
+          }}
+          elevation={2}
+        >
+          <MobileNumberForm handleSubmit={console.log} initialPhoneNumber={data.mobile} />
+        </Paper>
+        <Paper square className={classes.paper} elevation={2}>
           <Tabs
             classes={{ flexContainer: classes.tabs }}
             value={day}
