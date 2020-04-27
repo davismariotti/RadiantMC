@@ -1,3 +1,4 @@
+import CircularProgress from '@material-ui/core/CircularProgress'
 import Paper from '@material-ui/core/Paper'
 import { makeStyles } from '@material-ui/core/styles'
 import Tab from '@material-ui/core/Tab'
@@ -5,6 +6,7 @@ import Tabs from '@material-ui/core/Tabs'
 import _ from 'lodash'
 import React, { useState } from 'react'
 import { useParams } from 'react-router'
+import useUsernameRecord from '../../hooks/useUsernameRecord'
 import { PageWrapper } from '../styles'
 
 const useStyles = makeStyles(theme => ({
@@ -83,6 +85,9 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 
 
 export default function UsernamePage() {
   const { username } = useParams()
+
+  const { data, loading, error } = useUsernameRecord(username)
+
   const classes = useStyles()
   const [day, setDay] = useState(0)
   const [selected, setSelected] = useState(
@@ -98,9 +103,25 @@ export default function UsernamePage() {
     setSelected(copy)
   }
 
+  if (loading) {
+    return (
+      <PageWrapper>
+        <CircularProgress style={{ marginTop: 150 }} />
+      </PageWrapper>
+    )
+  }
+
+  if (error) {
+    return <div>{error.toString()}</div>
+  }
+
+  console.log('loading', loading)
+  console.log('error', error)
+  console.log('data', data)
+
   return (
     <PageWrapper>
-      Editing {username}
+      Editing {data.minecraft_username}
       <div style={{ marginTop: 100 }}>
         <Paper square className={classes.paper}>
           <Tabs
@@ -112,7 +133,7 @@ export default function UsernamePage() {
             aria-label="disabled tabs example"
           >
             {_.times(7, i => (
-              <Tab label={DAYS[i]} />
+              <Tab key={i} label={DAYS[i]} />
             ))}
           </Tabs>
           <div className={classes.paperContent}>
