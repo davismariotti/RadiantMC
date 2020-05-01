@@ -1,5 +1,5 @@
 from flask import Blueprint, request
-from sqlalchemy import and_
+from sqlalchemy import and_, func
 from twilio.rest import Client
 from models import Mobile
 from utils import create_success, check_token
@@ -26,8 +26,10 @@ def send(username):
     if req_json is not None and 'excludedPlayers' in req_json:
         excluded_players = req_json['excludedPlayers']
 
-    mobile_records = Mobile.query.filter(and_(Mobile.minecraft_username.notin_(excluded_players),
-                                              Mobile.minecraft_username != username)).all()
+    excluded_players = [item.lower() for item in excluded_players]
+
+    mobile_records = Mobile.query.filter(and_(func.lower(Mobile.minecraft_username).notin_(excluded_players),
+                                              func.lower(Mobile.minecraft_username) != func.lower(username))).all()
 
     now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone("America/Los_Angeles"))
     weekday = now.weekday()

@@ -1,6 +1,7 @@
 import re
 import json
 from flask import Blueprint, request
+from sqlalchemy import func
 
 from extensions import db
 from models import Mobile
@@ -36,7 +37,7 @@ def get_id(mobile_id):
 
 @mobile_api.route('/username/<username>', methods=['GET'])
 def get_username(username):
-    mobile_rec = Mobile.query.filter(Mobile.minecraft_username == username).first_or_404()
+    mobile_rec = Mobile.query.filter(func.lower(Mobile.minecraft_username) == func.lower(username)).first_or_404()
 
     return create_success(convert_mobile(mobile_rec))
 
