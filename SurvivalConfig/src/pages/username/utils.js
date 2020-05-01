@@ -1,5 +1,5 @@
 export const formatHour = hour => {
-  if (hour === 0) {
+  if (hour === 0 || hour === 24) {
     return '12a'
   } else if (hour === 12) {
     return '12p'
