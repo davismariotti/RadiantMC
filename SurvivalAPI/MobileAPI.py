@@ -1,7 +1,9 @@
 import re
 import json
+import os
 from flask import Blueprint, request
 from sqlalchemy import func
+from twilio.rest import Client
 
 from extensions import db
 from models import Mobile
@@ -11,13 +13,20 @@ DEFAULT_SLOTS = '[{"day": 0, "slots": []}, {"day": 1, "slots": []}, {"day": 2, "
 
 mobile_api = Blueprint('mobile_api', __name__)
 
+admin_phone_number = os.environ['NOTIFY_ADMIN_PHONE_NUMBER'] if 'NOTIFY_ADMIN_PHONE_NUMBER' in os.environ else None
+auth_token = os.environ['AUTH_TOKEN']
+account_sid = os.environ['ACCOUNT_SID']
+from_phone_number = os.environ['FROM_PHONE_NUMBER']
+
+client = Client(account_sid, auth_token)
+
 
 def validate_phone_number(mobile):
     return re.search(r'^\+1\d{10}$', mobile)
 
 
 def check_if_username_exists(minecraft_username):
-    return db.session.query(Mobile.minecraft_username)\
+    return db.session.query(Mobile.minecraft_username) \
                .filter(Mobile.minecraft_username == minecraft_username).count() > 0
 
 
@@ -60,6 +69,14 @@ def create_mobile():
     mobile_rec = Mobile(mobile=mobile, minecraft_username=minecraft_username, time_slots=DEFAULT_SLOTS)
     db.session.add(mobile_rec)
     db.session.commit()
+
+    if admin_phone_number is not None:
+        client.messages.create(
+            body="%s created a mobile record" % minecraft_username,
+            from_=from_phone_number,
+            to=admin_phone_number
+        )
+
     return create_success(convert_mobile(mobile_rec))
 
 
