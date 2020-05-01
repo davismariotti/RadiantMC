@@ -3,7 +3,10 @@ import API from '../api'
 import _ from 'lodash'
 import useForceUpdate from './useForceUpdate'
 
-export default function useGetAPI(endpoint, { onCompleted, onError }) {
+export default function useGetAPI(endpoint, options) {
+  const onCompleted = _.get(options, 'onCompleted')
+  const onError = _.get(options, 'onError')
+
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState()
   const [data, setData] = useState()
