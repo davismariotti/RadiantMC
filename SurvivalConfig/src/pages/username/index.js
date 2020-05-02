@@ -14,7 +14,7 @@ import { PageWrapper } from '../styles'
 import MobileNumberForm from './mobileNumberForm'
 import TimeSlots from './timeSlots'
 
-const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const useStyles = makeStyles({
   tabs: {

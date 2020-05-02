@@ -55,7 +55,7 @@ def is_inside_valid_time_slot(time_slots, weekday, hour):
         for hour_slot in hour_slots:
             start_hour = hour_slot['start_time']
             end_hour = hour_slot['end_time']
-            if start_hour <= hour < end_hour:
+            if start_hour <= hour <= end_hour:
                 return True
     return False
 
