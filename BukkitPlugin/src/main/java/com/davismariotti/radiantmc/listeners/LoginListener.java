@@ -92,7 +92,7 @@ public class LoginListener implements Listener {
                 Bukkit.getScheduler().runTaskAsynchronously(RadiantMCPlugin.instance, () -> {
                     LoginApiService service = new LoginApiService();
                     try {
-                        service.postPlayerLoggedIn(player.getName(), Bukkit.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+                        service.postPlayerLoggedIn(player.getUniqueId(), Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toList()));
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

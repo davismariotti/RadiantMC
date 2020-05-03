@@ -11,6 +11,7 @@ import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.UUID;
 
 public class LoginApiService {
 
@@ -21,7 +22,7 @@ public class LoginApiService {
     private final String baseUrl = configuration.getString("text.apiUrl");
     private final String apiKey = configuration.getString("text.apiKey");
 
-    public void postPlayerLoggedIn(String playerName, List<String> loggedInPlayers) throws IOException {
+    public void postPlayerLoggedIn(UUID playerName, List<UUID> loggedInPlayers) throws IOException {
         LoggedInPayload payload = new LoggedInPayload();
         payload.excludedPlayers = loggedInPlayers;
         String json = mapper.writeValueAsString(payload);

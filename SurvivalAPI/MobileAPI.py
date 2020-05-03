@@ -1,6 +1,7 @@
 import re
 import json
 import os
+import requests
 from flask import Blueprint, request
 from sqlalchemy import func
 from twilio.rest import Client
@@ -37,9 +38,9 @@ def get_phone(phone):
     return create_success(convert_mobile(mobile_rec))
 
 
-@mobile_api.route('/user/<mobile_id>', methods=['GET'])
-def get_id(mobile_id):
-    mobile_rec = Mobile.query.filter(Mobile.id == mobile_id).first_or_404()
+@mobile_api.route('/user/<uuid>', methods=['GET'])
+def get_id(uuid):
+    mobile_rec = Mobile.query.filter(Mobile.id == uuid).first_or_404()
 
     return create_success(convert_mobile(mobile_rec))
 
@@ -60,19 +61,28 @@ def create_mobile():
     mobile = req_json['mobile']
     minecraft_username = req_json['minecraft_username']
 
+    r = requests.get('https://api.mojang.com/users/profiles/minecraft/%s' % minecraft_username)
+
+    if r.status_code == 204:
+        return create_error('That minecraft username does not exist.')
+
+    json_response = r.json()
+    uuid = json_response['id']
+    name = json_response['name']
+
     if not validate_phone_number(mobile):
         return create_error('The mobile number is invalid.')
 
     if check_if_username_exists(minecraft_username):
         return create_error('There is already a record with that username.')
 
-    mobile_rec = Mobile(mobile=mobile, minecraft_username=minecraft_username, time_slots=DEFAULT_SLOTS)
+    mobile_rec = Mobile(id=uuid, mobile=mobile, minecraft_username=name, time_slots=DEFAULT_SLOTS)
     db.session.add(mobile_rec)
     db.session.commit()
 
     if admin_phone_number is not None:
         client.messages.create(
-            body="%s created a mobile record" % minecraft_username,
+            body="%s created a mobile record" % name,
             from_=from_phone_number,
             to=admin_phone_number
         )

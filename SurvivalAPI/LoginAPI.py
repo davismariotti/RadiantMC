@@ -2,11 +2,12 @@ from flask import Blueprint, request
 from sqlalchemy import and_, func
 from twilio.rest import Client
 from models import Mobile
-from utils import create_success, check_token
+from utils import create_success, check_token, create_error
 import os
 import datetime
 import pytz
 import json
+import requests
 
 auth_token = os.environ['AUTH_TOKEN']
 account_sid = os.environ['ACCOUNT_SID']
@@ -17,8 +18,8 @@ login_api = Blueprint('login_api', __name__)
 client = Client(account_sid, auth_token)
 
 
-@login_api.route('/login/<username>', methods=['POST'])
-def send(username):
+@login_api.route('/login/<uuid>', methods=['POST'])
+def send(uuid):
     check_token()
 
     excluded_players = []
@@ -26,10 +27,17 @@ def send(username):
     if req_json is not None and 'excludedPlayers' in req_json:
         excluded_players = req_json['excludedPlayers']
 
-    excluded_players = [item.lower() for item in excluded_players]
+    mobile_records = Mobile.query.filter(and_(Mobile.id.notin_(excluded_players), Mobile.id != uuid)).all()
 
-    mobile_records = Mobile.query.filter(and_(func.lower(Mobile.minecraft_username).notin_(excluded_players),
-                                              func.lower(Mobile.minecraft_username) != func.lower(username))).all()
+    # Get their minecraft username
+    # https://api.mojang.com/user/profiles/6cffa9a7-18de-45df-a374-3d2f8a2b0562/names
+    r = requests.get('https://api.mojang.com/user/profiles/%s/names' % str(uuid).replace('-', ''))
+
+    if r.status_code == 204:
+        return create_error('That minecraft username does not exist.')
+
+    json_response = r.json()
+    name = json_response[-1]['name']
 
     now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone("America/Los_Angeles"))
     weekday = now.weekday()
