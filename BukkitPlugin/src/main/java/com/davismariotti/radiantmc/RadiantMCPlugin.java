@@ -7,6 +7,8 @@ import com.davismariotti.radiantmc.commands.NickCommand;
 import com.davismariotti.radiantmc.commands.RemoveNickCommand;
 import com.davismariotti.radiantmc.listeners.DeathListener;
 import com.davismariotti.radiantmc.listeners.LoginListener;
+import com.davismariotti.radiantmc.listeners.LogoutListener;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -20,16 +22,20 @@ public class RadiantMCPlugin extends JavaPlugin {
 
     public static RadiantMCPlugin instance;
     private List<Listener> listeners = new ArrayList<>();
+    private File dataFile;
+    private YamlConfiguration data;
 
     public RadiantMCPlugin() {
         instance = this;
         listeners.add(new LoginListener());
         listeners.add(new DeathListener());
+        listeners.add(new LogoutListener());
     }
 
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        loadData();
         for (Listener listener : listeners) {
             getServer().getPluginManager().registerEvents(listener, this);
         }
@@ -44,6 +50,31 @@ public class RadiantMCPlugin extends JavaPlugin {
             if (!file.exists()) {
                 file.createNewFile();
             }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void loadData() {
+        File f = new File(getDataFolder(), "data.yml");
+        if (!f.exists()) {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        dataFile = f;
+        data = YamlConfiguration.loadConfiguration(f);
+    }
+
+    public YamlConfiguration getData() {
+        return data;
+    }
+
+    public void saveData() {
+        try {
+            data.save(dataFile);
         } catch (IOException e) {
             e.printStackTrace();
         }

@@ -82,14 +82,22 @@ public class LoginListener implements Listener {
 
         boolean textEnabled = configuration.getBoolean("text.enabled", false);
         if (textEnabled) {
-            Bukkit.getScheduler().runTaskAsynchronously(RadiantMCPlugin.instance, () -> {
-                LoginApiService service = new LoginApiService();
-                try {
-                    service.postPlayerLoggedIn(player.getName(), Bukkit.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            });
+            long textCooldown = configuration.getLong("text.cooldown", 5000L);
+            long now = System.currentTimeMillis();
+            long lastLoggedIn = RadiantMCPlugin.instance.getData().getLong(String.format("logout.%s", player.getUniqueId()), 0L);
+            RadiantMCPlugin.instance.getLogger().info(String.format("tc = %d; now = %d; ll = %d;", textCooldown, now, lastLoggedIn));
+
+            if (now - textCooldown > textCooldown) {
+
+                Bukkit.getScheduler().runTaskAsynchronously(RadiantMCPlugin.instance, () -> {
+                    LoginApiService service = new LoginApiService();
+                    try {
+                        service.postPlayerLoggedIn(player.getName(), Bukkit.getServer().getOnlinePlayers().stream().map(Player::getName).collect(Collectors.toList()));
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                });
+            }
         }
     }
 
