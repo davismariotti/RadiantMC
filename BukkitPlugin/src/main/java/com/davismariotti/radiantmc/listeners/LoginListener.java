@@ -85,8 +85,6 @@ public class LoginListener implements Listener {
             long textCooldown = configuration.getLong("text.cooldown", 5000L);
             long now = System.currentTimeMillis();
             long lastLoggedIn = RadiantMCPlugin.instance.getData().getLong(String.format("logout.%s", player.getUniqueId()), 0L);
-            RadiantMCPlugin.instance.getLogger().info(String.format("tc = %d; now = %d; ll = %d; now - tc = %d", textCooldown, now, lastLoggedIn, now - lastLoggedIn));
-
             if (now - lastLoggedIn > textCooldown) {
 
                 Bukkit.getScheduler().runTaskAsynchronously(RadiantMCPlugin.instance, () -> {
