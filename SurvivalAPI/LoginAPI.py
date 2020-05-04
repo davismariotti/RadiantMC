@@ -47,7 +47,7 @@ def send(uuid):
         time_slots = json.loads(mobile_record.time_slots)
         if is_inside_valid_time_slot(time_slots, weekday, hour):
             messages.append(client.messages.create(
-                body="%s logged in" % username,
+                body="%s logged in" % name,
                 from_=from_phone_number,
                 to=mobile_record.mobile
             ))
