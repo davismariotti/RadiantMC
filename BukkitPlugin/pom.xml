@@ -6,7 +6,7 @@
 
     <groupId>davismariotti.com</groupId>
     <artifactId>radiantmc</artifactId>
-    <version>1.3</version>
+    <version>1.4</version>
     <name>RadiantMCPlugin</name>
     <build>
         <defaultGoal>clean package install</defaultGoal>
@@ -77,6 +77,11 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
             <version>4.2.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>30.1.1-jre</version>
         </dependency>
 
 

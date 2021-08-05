@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
+import org.jetbrains.annotations.NotNull;
 
 public class LastLoginCommand implements CommandExecutor {
 
@@ -33,7 +34,7 @@ public class LastLoginCommand implements CommandExecutor {
     }
 
     @Override
-    public boolean onCommand(CommandSender commandSender, Command command, String s, String[] strings) {
+    public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         List<LoginData> loginDataList = new ArrayList<>();
         for (OfflinePlayer offlinePlayer : RadiantMCPlugin.instance.getServer().getOfflinePlayers()) {
             loginDataList.add(new LoginData(offlinePlayer.getName(), offlinePlayer.getLastPlayed()));

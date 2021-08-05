@@ -1,8 +1,20 @@
 package com.davismariotti.radiantmc.listeners;
 
+import static com.davismariotti.radiantmc.util.NicknameChatColors.getDesiredChatColors;
+import static com.davismariotti.radiantmc.util.RandomUtils.getRandomObject;
+
 import com.davismariotti.radiantmc.RadiantMCPlugin;
 import com.davismariotti.radiantmc.util.LoginApiService;
 import com.davismariotti.radiantmc.util.SendGridService;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -12,20 +24,18 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class LoginListener implements Listener {
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
         Player player = event.getPlayer();
+        sendMotd(player);
+        sendLoggedInEmail(player);
+        sendLoggedInText(player);
+        setNameColor(player);
+    }
+
+    public void sendMotd(Player player) {
         try {
             File file = new File(RadiantMCPlugin.instance.getDataFolder(), "motd.txt");
             if (!file.exists()) {
@@ -37,8 +47,9 @@ public class LoginListener implements Listener {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
-        // Respect cooldown
+    public void sendLoggedInEmail(Player player) {
         FileConfiguration configuration = RadiantMCPlugin.instance.getConfig();
         boolean emailEnabled = configuration.getBoolean("email.enabled", false);
 
@@ -62,8 +73,12 @@ public class LoginListener implements Listener {
                             int sentCount = 0;
                             for (Map.Entry<String, Object> recipient : recipients.entrySet()) {
                                 String recipientName = recipient.getKey();
-                                if (recipientName.equals(player.getName())) continue;
-                                if (Bukkit.getServer().getOnlinePlayers().stream().anyMatch(p -> p.getName().equals(recipientName))) continue;
+                                if (recipientName.equals(player.getName())) {
+                                    continue;
+                                }
+                                if (Bukkit.getServer().getOnlinePlayers().stream().anyMatch(p -> p.getName().equals(recipientName))) {
+                                    continue;
+                                }
 
                                 try {
                                     service.sendLoggedInEmail((String) recipient.getValue(), player.getName());
@@ -79,7 +94,10 @@ public class LoginListener implements Listener {
                 }
             }
         }
+    }
 
+    public void sendLoggedInText(Player player) {
+        FileConfiguration configuration = RadiantMCPlugin.instance.getConfig();
         boolean textEnabled = configuration.getBoolean("text.enabled", false);
         if (textEnabled) {
             long textCooldown = configuration.getLong("text.cooldown", 5000L);
@@ -98,5 +116,37 @@ public class LoginListener implements Listener {
             }
         }
     }
+
+    public void setNameColor(Player player) {
+        ConfigurationSection data = RadiantMCPlugin.instance.getData().getConfigurationSection("color");
+        if (data == null) {
+            return;
+        }
+        // Check if they have a color set already
+        String color = data.getString(player.getUniqueId().toString());
+        if (color != null) {
+            player.setDisplayName(ChatColor.valueOf(color) + player.getName() + ChatColor.RESET);
+        } else {
+            // Create a list of untaken colors
+            Set<ChatColor> availableColors = getDesiredChatColors();
+
+            data.getKeys(false).forEach(key -> {
+                availableColors.remove(ChatColor.valueOf(data.getString(key)));
+            });
+
+            // If all colors are gone, re-add them
+            if (availableColors.size() == 0) {
+                availableColors.addAll(getDesiredChatColors());
+            }
+
+            ChatColor newColor = getRandomObject(availableColors);
+
+            player.setDisplayName(newColor + player.getName() + ChatColor.RESET);
+            data.set(player.getUniqueId().toString(), newColor.name());
+            RadiantMCPlugin.instance.saveData();
+
+        }
+    }
+
 
 }

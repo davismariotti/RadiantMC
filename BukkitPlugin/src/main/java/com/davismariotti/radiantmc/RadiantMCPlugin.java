@@ -4,7 +4,6 @@ import com.davismariotti.radiantmc.commands.LastLoginCommand;
 import com.davismariotti.radiantmc.commands.MotdCommand;
 import com.davismariotti.radiantmc.commands.NetherCoordsCommand;
 import com.davismariotti.radiantmc.commands.NickCommand;
-import com.davismariotti.radiantmc.commands.RemoveNickCommand;
 import com.davismariotti.radiantmc.listeners.DeathListener;
 import com.davismariotti.radiantmc.listeners.LoginListener;
 import com.davismariotti.radiantmc.listeners.LogoutListener;
@@ -40,7 +39,6 @@ public class RadiantMCPlugin extends JavaPlugin {
             getServer().getPluginManager().registerEvents(listener, this);
         }
         Objects.requireNonNull(getCommand("nick")).setExecutor(new NickCommand());
-        Objects.requireNonNull(getCommand("removenick")).setExecutor(new RemoveNickCommand());
         Objects.requireNonNull(getCommand("lastlogin")).setExecutor(new LastLoginCommand());
         Objects.requireNonNull(getCommand("nethercoords")).setExecutor(new NetherCoordsCommand());
         Objects.requireNonNull(getCommand("motd")).setExecutor(new MotdCommand());
@@ -66,6 +64,11 @@ public class RadiantMCPlugin extends JavaPlugin {
         }
         dataFile = f;
         data = YamlConfiguration.loadConfiguration(f);
+
+        if (!data.isConfigurationSection("color")) {
+            data.createSection("color");
+        }
+        saveData();
     }
 
     public YamlConfiguration getData() {

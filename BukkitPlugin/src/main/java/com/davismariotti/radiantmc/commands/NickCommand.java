@@ -1,10 +1,12 @@
 package com.davismariotti.radiantmc.commands;
 
+import com.davismariotti.radiantmc.RadiantMCPlugin;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 
 public class NickCommand implements CommandExecutor {
@@ -33,6 +35,14 @@ public class NickCommand implements CommandExecutor {
             }
         }
         player.setDisplayName(chatColor + player.getName() + ChatColor.RESET);
+
+        ConfigurationSection data = RadiantMCPlugin.instance.getData().getConfigurationSection("color");
+        if (data == null) {
+            return true;
+        }
+        data.set(player.getUniqueId().toString(), chatColor.name());
+        RadiantMCPlugin.instance.saveData();
+
         sender.sendMessage("Chat color changed.");
         return true;
     }
