@@ -2,25 +2,27 @@ package com.davismariotti.radiantmc.util;
 
 import com.davismariotti.radiantmc.RadiantMCPlugin;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-import org.bukkit.configuration.file.FileConfiguration;
+import com.google.inject.Inject;
+import okhttp3.*;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
 public class LoginApiService {
 
+    private final String baseUrl;
+    private final String apiKey;
 
     private final OkHttpClient httpClient = new OkHttpClient();
     private final ObjectMapper mapper = new ObjectMapper();
-    private final FileConfiguration configuration = RadiantMCPlugin.instance.getConfig();
-    private final String baseUrl = configuration.getString("text.apiUrl");
-    private final String apiKey = configuration.getString("text.apiKey");
+
+    @Inject
+    public LoginApiService(RadiantMCPlugin plugin) {
+        this.baseUrl = plugin.getConfig().getString("text.apiUrl");
+        this.apiKey = plugin.getConfig().getString("text.apiKey");
+    }
 
     public void postPlayerLoggedIn(UUID playerName, List<UUID> loggedInPlayers) throws IOException {
         LoggedInPayload payload = new LoggedInPayload();
@@ -38,7 +40,7 @@ public class LoginApiService {
         try (Response response = httpClient.newCall(request).execute()) {
 
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
-            System.out.println(response.body().string());
+            System.out.println(Objects.requireNonNull(response.body()).string());
         }
 
     }

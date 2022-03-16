@@ -6,15 +6,13 @@ import com.sendgrid.SendGrid;
 import com.sendgrid.helpers.mail.Mail;
 import com.sendgrid.helpers.mail.objects.Content;
 import com.sendgrid.helpers.mail.objects.Email;
+import lombok.AllArgsConstructor;
 
 import java.io.IOException;
 
+@AllArgsConstructor
 public class SendGridService {
-    private String apiKey;
-
-    public SendGridService(String apiKey) {
-        this.apiKey = apiKey;
-    }
+    private final String apiKey;
 
     public void sendLoggedInEmail(String recipient, String loggedInName) throws IOException {
         Email from = new Email("survival@davismariotti.com");

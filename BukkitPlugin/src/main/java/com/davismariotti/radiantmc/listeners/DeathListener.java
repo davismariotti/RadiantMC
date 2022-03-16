@@ -1,6 +1,8 @@
 package com.davismariotti.radiantmc.listeners;
 
 import com.davismariotti.radiantmc.RadiantMCPlugin;
+import com.google.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -11,7 +13,10 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class DeathListener implements Listener {
+
+    private final RadiantMCPlugin plugin;
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {
@@ -21,13 +26,13 @@ public class DeathListener implements Listener {
         if (killer != null && !player.getName().equals(killer.getName())) {
             ItemStack skull = new ItemStack(Material.PLAYER_HEAD);
             SkullMeta meta = (SkullMeta) skull.getItemMeta();
-            meta.setOwningPlayer(player);
-            skull.setItemMeta(meta);
+            if (meta != null) {
+                meta.setOwningPlayer(player);
+                skull.setItemMeta(meta);
 
-            World world = player.getWorld();
-            Bukkit.getScheduler().runTaskLater(RadiantMCPlugin.instance, () -> {
-                world.dropItemNaturally(player.getLocation(), skull);
-            }, 20L);
+                World world = player.getWorld();
+                Bukkit.getScheduler().runTaskLater(plugin, () -> world.dropItemNaturally(player.getLocation(), skull), 20L);
+            }
         }
     }
 }

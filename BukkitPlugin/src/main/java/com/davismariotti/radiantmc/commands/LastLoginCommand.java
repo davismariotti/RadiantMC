@@ -1,6 +1,9 @@
 package com.davismariotti.radiantmc.commands;
 
 import com.davismariotti.radiantmc.RadiantMCPlugin;
+import com.google.inject.Inject;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -13,30 +16,22 @@ import org.jetbrains.annotations.NotNull;
 
 public class LastLoginCommand implements CommandExecutor {
 
-    private SimpleDateFormat dateFormat = new SimpleDateFormat(String.format("M-d-YY '%sat%s' hh:mma  ", ChatColor.GOLD, ChatColor.RED));
+    @Inject
+    RadiantMCPlugin plugin;
 
+    private final SimpleDateFormat dateFormat = new SimpleDateFormat(String.format("M-d-YY '%sat%s' hh:mma  ", ChatColor.GOLD, ChatColor.RED));
+
+    @Getter
+    @AllArgsConstructor
     private static class LoginData {
-        private String name;
-        private Long loginTime;
-
-        private LoginData(String name, Long loginTime) {
-            this.name = name;
-            this.loginTime = loginTime;
-        }
-
-        public Long getLoginTime() {
-            return loginTime;
-        }
-
-        public String getName() {
-            return name;
-        }
+        private final String name;
+        private final Long loginTime;
     }
 
     @Override
     public boolean onCommand(@NotNull CommandSender commandSender, @NotNull Command command, @NotNull String s, @NotNull String[] strings) {
         List<LoginData> loginDataList = new ArrayList<>();
-        for (OfflinePlayer offlinePlayer : RadiantMCPlugin.instance.getServer().getOfflinePlayers()) {
+        for (OfflinePlayer offlinePlayer : plugin.getServer().getOfflinePlayers()) {
             loginDataList.add(new LoginData(offlinePlayer.getName(), offlinePlayer.getLastPlayed()));
         }
         loginDataList.sort(Comparator.comparing(LoginData::getLoginTime));

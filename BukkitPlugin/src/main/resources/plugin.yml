@@ -2,7 +2,7 @@ name: RadiantMCPlugin
 version: ${project.version}
 author: Davis Mariotti
 main: com.davismariotti.radiantmc.RadiantMCPlugin
-api-version: 1.13
+api-version: 1.18
 
 commands:
   nick:

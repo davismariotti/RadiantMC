@@ -6,7 +6,7 @@ import org.bukkit.ChatColor;
 
 public class NicknameChatColors {
 
-    private static Set<ChatColor> desiredChatColors = new HashSet<ChatColor>() {{
+    private static final Set<ChatColor> desiredChatColors = new HashSet<>() {{
         add(ChatColor.DARK_RED);
         add(ChatColor.RED);
         add(ChatColor.GOLD);

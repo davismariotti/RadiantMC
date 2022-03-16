@@ -1,15 +1,21 @@
 package com.davismariotti.radiantmc.commands;
 
-import com.davismariotti.radiantmc.RadiantMCPlugin;
+import com.davismariotti.radiantmc.data.DataFile;
+import com.google.inject.Inject;
+import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.jetbrains.annotations.NotNull;
 
+@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class NickCommand implements CommandExecutor {
+
+    private final DataFile dataFile;
+
     private boolean setChatColor(CommandSender sender, Player player, String color) {
         if (player == null) {
             sender.sendMessage("Invalid player name.");
@@ -36,25 +42,19 @@ public class NickCommand implements CommandExecutor {
         }
         player.setDisplayName(chatColor + player.getName() + ChatColor.RESET);
 
-        ConfigurationSection data = RadiantMCPlugin.instance.getData().getConfigurationSection("color");
-        if (data == null) {
-            return true;
-        }
-        data.set(player.getUniqueId().toString(), chatColor.name());
-        RadiantMCPlugin.instance.saveData();
+        dataFile.setColor(player, chatColor);
 
         sender.sendMessage("Chat color changed.");
         return true;
     }
 
     @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
+    public boolean onCommand(@NotNull CommandSender sender, @NotNull Command command, @NotNull String label, String[] args) {
         if (args.length == 0) {
             sender.sendMessage("Usage: /nick {your nickname color}");
             return true;
         } else if (args.length == 1) {
-            if (sender instanceof Player) {
-                Player player = (Player) sender;
+            if (sender instanceof Player player) {
                 return setChatColor(sender, player, args[0].toUpperCase());
             } else {
                 sender.sendMessage("Usage: /nick {player name} {color}");
