@@ -1,0 +1,10 @@
+version: "3.9"
+services:
+  survival_api:
+    container_name: SurvivalAPI
+    image: davismariotti/survivalapi:1.0
+    ports:
+      - "5050:5050"
+    env_file:
+      - environment.txt
+    restart: on-failure

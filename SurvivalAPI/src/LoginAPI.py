@@ -3,8 +3,9 @@ from sqlalchemy import and_, func
 from twilio.rest import Client
 from models import Mobile
 from utils import create_success, check_token, create_error
+from pushover import send_pushover_message
+from datetime import datetime
 import os
-import datetime
 import pytz
 import json
 import requests
@@ -30,28 +31,36 @@ def send(uuid):
     mobile_records = Mobile.query.filter(and_(Mobile.id.notin_(excluded_players), Mobile.id != uuid)).all()
 
     # Get their minecraft username
-    # https://api.mojang.com/user/profiles/6cffa9a7-18de-45df-a374-3d2f8a2b0562/names
-    r = requests.get('https://api.mojang.com/user/profiles/%s/names' % str(uuid).replace('-', ''))
+    r = requests.get('https://sessionserver.mojang.com/session/minecraft/profile/%s' % str(uuid).replace('-', ''))
 
     if r.status_code == 204:
         return create_error('That minecraft username does not exist.')
 
     json_response = r.json()
-    name = json_response[-1]['name']
+    name = json_response['name']
 
-    now = datetime.datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone("America/Los_Angeles"))
+    now = datetime.utcnow().replace(tzinfo=pytz.utc).astimezone(pytz.timezone("America/Los_Angeles"))
     weekday = now.weekday()
     hour = now.hour
     messages = []
     for mobile_record in mobile_records:
         time_slots = json.loads(mobile_record.time_slots)
         if is_inside_valid_time_slot(time_slots, weekday, hour):
-            messages.append(client.messages.create(
-                body="%s logged in" % name,
-                from_=from_phone_number,
-                to=mobile_record.mobile
-            ))
-    return create_success(list(map(convert_message, messages)))
+            if mobile_record.use_pushover:
+                r = send_pushover_message("%s logged in" % name)
+                messages.append({
+                    "to": "pushover",
+                    "request": r["request"],
+                    "date_created": str(datetime.now())
+                })
+            else:
+                messages.append(convert_message(client.messages.create(
+                    body="%s logged in" % name,
+                    from_=from_phone_number,
+                    to=mobile_record.mobile
+                )))
+
+    return create_success(messages)
 
 
 def is_inside_valid_time_slot(time_slots, weekday, hour):
