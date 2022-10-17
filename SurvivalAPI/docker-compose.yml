@@ -2,7 +2,7 @@ version: "3.9"
 services:
   survival_api:
     container_name: SurvivalAPI
-    image: davismariotti/survivalapi:1.0
+    image: davismariotti/survivalapi:1.1
     ports:
       - "5050:5050"
     env_file:

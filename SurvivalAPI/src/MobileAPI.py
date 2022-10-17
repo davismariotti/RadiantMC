@@ -76,7 +76,7 @@ def create_mobile():
     if check_if_username_exists(minecraft_username):
         return create_error('There is already a record with that username.')
 
-    mobile_rec = Mobile(id=uuid, mobile=mobile, minecraft_username=name, time_slots=DEFAULT_SLOTS)
+    mobile_rec = Mobile(id=uuid, mobile=mobile, minecraft_username=name, time_slots=DEFAULT_SLOTS, use_pushover=False)
     db.session.add(mobile_rec)
     db.session.commit()
 
