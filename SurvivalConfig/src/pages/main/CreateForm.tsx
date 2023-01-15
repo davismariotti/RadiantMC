@@ -1,10 +1,11 @@
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
-import Typography from '@material-ui/core/Typography'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
 import { Form, Formik } from 'formik'
 import React from 'react'
 import InputMask from 'react-input-mask'
 import * as Yup from 'yup'
+import { CreateFormValues } from '../../types'
 
 const CreateSchema = Yup.object().shape({
   username: Yup.string().min(3, 'Too Short!').max(16, 'Too Long!').required('Required'),
@@ -13,19 +14,22 @@ const CreateSchema = Yup.object().shape({
     .matches(/^\(\d{3}\) \d{3}-\d{4}$/, { message: 'Invalid phone number' }),
 })
 
-export default function CreateForm(props) {
+interface Props {
+  handleSubmit: any
+  initialValues: CreateFormValues
+}
+
+export default function CreateForm(props: Props) {
   const { handleSubmit, initialValues } = props
+
+  const initial: CreateFormValues = {
+    username: '',
+    mobile: '',
+    ...initialValues,
+  }
+
   return (
-    <Formik
-      initialValues={{
-        username: '',
-        mobile: '',
-        ...initialValues,
-      }}
-      onSubmit={handleSubmit}
-      validationSchema={CreateSchema}
-      isInitialValid={false}
-    >
+    <Formik initialValues={initial} onSubmit={handleSubmit} validationSchema={CreateSchema} isInitialValid={false}>
       {({ values, errors, handleChange, handleBlur, isValid, touched }) => {
         return (
           <Form>
@@ -48,17 +52,15 @@ export default function CreateForm(props) {
                   style={{ marginRight: 16 }}
                 />
                 <InputMask mask="(999) 999-9999" value={values.mobile} onChange={handleChange} maskChar=" ">
-                  {() => (
-                    <TextField
-                      id="mobile-input"
-                      label="Phone number"
-                      variant="outlined"
-                      name="mobile"
-                      value={values.mobile}
-                      error={!!errors.mobile}
-                      helperText={errors.mobile}
-                    />
-                  )}
+                  <TextField
+                    id="mobile-input"
+                    label="Phone number"
+                    variant="outlined"
+                    name="mobile"
+                    value={values.mobile}
+                    error={!!errors.mobile}
+                    helperText={errors.mobile}
+                  />
                 </InputMask>
                 <Button
                   color="primary"

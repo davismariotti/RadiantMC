@@ -1,24 +1,26 @@
-import Button from '@material-ui/core/Button'
-import TextField from '@material-ui/core/TextField'
-import Typography from '@material-ui/core/Typography'
-import { Form, Formik } from 'formik'
+import Button from '@mui/material/Button'
+import TextField from '@mui/material/TextField'
+import Typography from '@mui/material/Typography'
+import { Form, Formik, FormikHelpers } from 'formik'
 import React from 'react'
 import * as Yup from 'yup'
+import { UsernameFormValues } from '../../types'
 
 const UsernameSchema = Yup.object().shape({
   username: Yup.string().min(3, 'Too Short!').max(16, 'Too Long!').required('Required'),
 })
 
-export default function UserNameForm(props) {
+interface Props {
+  handleSubmit: (values: UsernameFormValues, formikHelpers: FormikHelpers<UsernameFormValues>) => void
+}
+
+export default function UserNameForm(props: Props) {
   const { handleSubmit } = props
+
+  const initialValues: UsernameFormValues = { username: '' }
+
   return (
-    <Formik
-      initialValues={{
-        username: '',
-      }}
-      onSubmit={handleSubmit}
-      validationSchema={UsernameSchema}
-    >
+    <Formik initialValues={initialValues} onSubmit={handleSubmit} validationSchema={UsernameSchema}>
       {({ values, errors, handleChange, handleBlur }) => (
         <Form>
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center' }}>

@@ -1,13 +1,14 @@
-import Button from '@material-ui/core/Button'
-import Dialog from '@material-ui/core/Dialog'
-import DialogActions from '@material-ui/core/DialogActions'
-import DialogContent from '@material-ui/core/DialogContent'
-import DialogContentText from '@material-ui/core/DialogContentText'
-import DialogTitle from '@material-ui/core/DialogTitle'
-import Slider from '@material-ui/core/Slider'
-import { makeStyles } from '@material-ui/core/styles'
+import Button from '@mui/material/Button'
+import Dialog from '@mui/material/Dialog'
+import DialogActions from '@mui/material/DialogActions'
+import DialogContent from '@mui/material/DialogContent'
+import DialogContentText from '@mui/material/DialogContentText'
+import DialogTitle from '@mui/material/DialogTitle'
+import Slider from '@mui/material/Slider'
+import { makeStyles } from '@mui/styles'
 import React, { useState } from 'react'
 import { formatHour, generateGUID } from './utils'
+import { TimeSlot } from '../../types'
 
 const useStyles = makeStyles({
   slider: {
@@ -15,7 +16,13 @@ const useStyles = makeStyles({
   },
 })
 
-export default function HourSelectorDialog(props) {
+export default function HourSelectorDialog(props: {
+  open: boolean
+  onSubmit: (timeSlot: TimeSlot) => void
+  onClose: () => void
+  editId: string | undefined
+  initialValue: [number, number]
+}) {
   const { open, onSubmit, onClose, editId, initialValue } = props
   const classes = useStyles()
 
@@ -30,7 +37,7 @@ export default function HourSelectorDialog(props) {
     })
   }
 
-  const handleChange = (event, newValue) => {
+  const handleChange = (event: any, newValue: any) => {
     setValue(newValue)
   }
 

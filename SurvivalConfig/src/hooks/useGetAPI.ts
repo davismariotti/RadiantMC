@@ -1,14 +1,15 @@
+import _ from 'lodash'
 import { useEffect, useState } from 'react'
 import API from '../api'
-import _ from 'lodash'
 import useForceUpdate from './useForceUpdate'
+import { GetOptions, GetResult } from '../types'
 
-export default function useGetAPI(endpoint, options) {
+export default function useGetAPI(endpoint: string, options?: GetOptions): GetResult {
   const onCompleted = _.get(options, 'onCompleted')
   const onError = _.get(options, 'onError')
 
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState()
+  const [error, setError] = useState<Error | undefined>()
   const [data, setData] = useState()
   const [refetchValue, refetch] = useForceUpdate()
 
@@ -27,13 +28,14 @@ export default function useGetAPI(endpoint, options) {
         }
         setLoading(false)
       })
-      .catch(error => {
+      .catch((error: Error) => {
         setError(error)
         setLoading(false)
         if (onError) {
           onError(error)
         }
       })
+    // eslint-disable-next-line
   }, [endpoint, refetchValue])
 
   return { data, loading, error, refetch }

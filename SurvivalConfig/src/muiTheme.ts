@@ -1,6 +1,6 @@
-import { createMuiTheme } from '@material-ui/core/styles'
+import { createTheme, Theme } from '@mui/material/styles'
 
-const theme = createMuiTheme({
+const theme = createTheme({
   palette: {
     error: {
       light: '#ff967c',
@@ -23,22 +23,17 @@ const theme = createMuiTheme({
       dark: '#0067c7',
     },
   },
-  breakpoints: {
-    values: {
-      md: 1024,
-      lg: 1440,
-      xl: 1660,
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: { textTransform: 'none' },
+      },
     },
   },
 })
 
-theme.overrides = {
-  ...theme.overrides,
-  MuiButton: {
-    root: {
-      textTransform: 'none',
-    },
-  },
+declare module '@mui/styles/defaultTheme' {
+  interface DefaultTheme extends Theme {}
 }
 
 export default theme

@@ -1,14 +1,15 @@
-import AppBar from '@material-ui/core/AppBar'
-import IconButton from '@material-ui/core/IconButton'
-import { makeStyles } from '@material-ui/core/styles'
-import Toolbar from '@material-ui/core/Toolbar'
-import Typography from '@material-ui/core/Typography'
-import { HomeRounded } from '@material-ui/icons'
+import AppBar from '@mui/material/AppBar'
+import IconButton from '@mui/material/IconButton'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import { HomeRounded } from '@mui/icons-material'
 import React from 'react'
 import { useHistory } from 'react-router'
 import GithubIcon from '../../icons/GithubIcon'
+import { makeStyles } from '@mui/styles'
+import { Theme } from '@mui/material/styles'
 
-const useStyles = makeStyles(theme => ({
+const useStyles = makeStyles((theme: Theme) => ({
   menuButton: {
     marginRight: theme.spacing(2),
   },

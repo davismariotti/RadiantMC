@@ -1,15 +1,16 @@
 import _ from 'lodash'
 import { useState } from 'react'
 import API from '../api'
+import { GetOptions, LazyGetResult } from '../types'
 
-export default function useLazyGetAPI(options) {
+export default function useLazyGetAPI(options?: GetOptions): LazyGetResult {
   const onCompleted = _.get(options, 'onCompleted')
   const onError = _.get(options, 'onError')
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState()
-  const [data, setData] = useState()
+  const [error, setError] = useState<Error | undefined>()
+  const [data, setData] = useState<any | undefined>()
 
-  const get = endpoint => {
+  const get = (endpoint: string) => {
     setLoading(true)
     return API.get(endpoint)
       .then(response => {

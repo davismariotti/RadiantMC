@@ -1,9 +1,9 @@
-import LinearProgress from '@material-ui/core/LinearProgress'
-import Paper from '@material-ui/core/Paper'
-import { makeStyles } from '@material-ui/core/styles'
-import Tab from '@material-ui/core/Tab'
-import Tabs from '@material-ui/core/Tabs'
-import Typography from '@material-ui/core/Typography'
+import LinearProgress from '@mui/material/LinearProgress'
+import Paper from '@mui/material/Paper'
+import { makeStyles } from '@mui/styles'
+import Tab from '@mui/material/Tab'
+import Tabs from '@mui/material/Tabs'
+import Typography from '@mui/material/Typography'
 import _ from 'lodash'
 import React, { useState } from 'react'
 import { useParams } from 'react-router'
@@ -11,10 +11,11 @@ import useUpdateMobileNumber from '../../hooks/useUpdateMobileNumber'
 import useUpdateTimeSlots from '../../hooks/useUpdateTimeSlots'
 import useUsernameRecord from '../../hooks/useUsernameRecord'
 import { PageWrapper } from '../styles'
-import MobileNumberForm from './mobileNumberForm'
-import TimeSlots from './timeSlots'
+import MobileNumberForm from './MobileNumberForm'
+import TimeSlots from './TimeSlots'
+import { MobileNumberFormValues } from '../../types'
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+const DAYS: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
 const useStyles = makeStyles({
   tabs: {
@@ -43,17 +44,17 @@ const useStyles = makeStyles({
 })
 
 export default function UsernamePage() {
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
 
   const classes = useStyles()
-  const [day, setDay] = useState(0)
+  const [day, setDay] = useState<number>(0)
 
   const { data, loading: loadingUsernameRecord, error, refetch } = useUsernameRecord(id)
   const [updateMobileNumber, { loading: updatingMobileNumber }] = useUpdateMobileNumber(id)
   const [updateTimeSlots, { loading: updatingTimeSlots }] = useUpdateTimeSlots(id)
   const loading = loadingUsernameRecord || updatingMobileNumber || updatingTimeSlots
 
-  const handleSubmitMobileNumberChange = values => {
+  const handleSubmitMobileNumberChange = (values: MobileNumberFormValues) => {
     updateMobileNumber({ mobile: `+1${values.mobile.replace(/\D/g, '')}` }).then(refetch)
   }
 

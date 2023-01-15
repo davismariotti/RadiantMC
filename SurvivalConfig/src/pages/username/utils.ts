@@ -1,4 +1,4 @@
-export const formatHour = hour => {
+export const formatHour = (hour: number): string => {
   if (hour === 0 || hour === 24) {
     return '12a'
   } else if (hour === 12) {
@@ -9,7 +9,7 @@ export const formatHour = hour => {
   return `${hour - 12}p`
 }
 
-export const generateGUID = () => {
+export const generateGUID = (): string => {
   let d = new Date().getTime()
   if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
     d += performance.now()

@@ -1,11 +1,12 @@
 import _ from 'lodash'
 import { useState } from 'react'
 import API from '../api'
+import { PostResult } from '../types'
 
-export default function usePostAPI(endpoint) {
+export default function usePostAPI(endpoint: string): PostResult {
   const [loading, setLoading] = useState(false)
 
-  const post = data => {
+  const post = (data: any) => {
     setLoading(true)
     return API.post(endpoint, {
       ...data,
