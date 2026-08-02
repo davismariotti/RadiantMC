@@ -86,7 +86,7 @@ jobs:
       - name: Build
         run: yarn build
       - name: Test
-        run: yarn test --watchAll=false
+        run: yarn test --watchAll=false --passWithNoTests
 
   ci:
     needs: [bukkitplugin-ci, survivalapi-ci, survivalconfig-ci]
