@@ -2,3 +2,6 @@
 target/
 .DS_Store
 *.iml
+.claude/
+.codex/
+openspec/
