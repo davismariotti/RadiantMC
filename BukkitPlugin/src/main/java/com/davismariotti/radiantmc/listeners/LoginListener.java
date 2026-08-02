@@ -5,7 +5,6 @@ import com.davismariotti.radiantmc.data.DataFile;
 import com.davismariotti.radiantmc.util.LoginApiService;
 import com.davismariotti.radiantmc.util.SendGridService;
 import com.google.inject.Inject;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
@@ -24,12 +23,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class LoginListener implements Listener {
 
     private final DataFile dataFile;
     private final RadiantMCPlugin plugin;
     private final LoginApiService loginApiService;
+
+    @Inject
+    public LoginListener(DataFile dataFile, RadiantMCPlugin plugin, LoginApiService loginApiService) {
+        this.dataFile = dataFile;
+        this.plugin = plugin;
+        this.loginApiService = loginApiService;
+    }
 
     @EventHandler
     public void onJoin(PlayerJoinEvent event) {
@@ -93,7 +98,9 @@ public class LoginListener implements Listener {
                                     e.printStackTrace();
                                 }
                             }
-                            plugin.getLogger().info(String.format("Emails sent to %d recipient%s", sentCount, sentCount == 1 ? "" : "s"));
+                            final String message = String.format("Emails sent to %d recipient%s", sentCount, sentCount == 1 ? "" : "s");
+                            plugin.getLogger().info(message);
+//                            player.sendMessage(message);
                         }
                     }
                 }
@@ -113,7 +120,10 @@ public class LoginListener implements Listener {
 
                 Bukkit.getScheduler().runTaskAsynchronously(plugin, () -> {
                     try {
-                        loginApiService.postPlayerLoggedIn(player.getUniqueId(), Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toList()));
+                        int count = loginApiService.postPlayerLoggedIn(player.getUniqueId(), Bukkit.getServer().getOnlinePlayers().stream().map(Player::getUniqueId).collect(Collectors.toList()));
+                        final String message = String.format("Texts sent to %d recipient%s", count, count == 1 ? "" : "s");
+                        plugin.getLogger().info(message);
+//                        player.sendMessage(message);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }

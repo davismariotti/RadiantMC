@@ -3,7 +3,6 @@ package com.davismariotti.radiantmc.data;
 import com.davismariotti.radiantmc.RadiantMCPlugin;
 import com.google.inject.Inject;
 import com.google.inject.Singleton;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.ChatColor;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,12 +16,16 @@ import static com.davismariotti.radiantmc.util.NicknameChatColors.getDesiredChat
 import static com.davismariotti.radiantmc.util.RandomUtils.getRandomObject;
 
 @Singleton
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class DataFile {
     private File dataFile;
     private YamlConfiguration data;
 
     private final RadiantMCPlugin plugin;
+
+    @Inject
+    public DataFile(RadiantMCPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     public void loadData() {
         File f = new File(plugin.getDataFolder(), "data.yml");

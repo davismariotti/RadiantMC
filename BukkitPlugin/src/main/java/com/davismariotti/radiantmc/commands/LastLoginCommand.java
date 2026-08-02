@@ -2,8 +2,6 @@ package com.davismariotti.radiantmc.commands;
 
 import com.davismariotti.radiantmc.RadiantMCPlugin;
 import com.google.inject.Inject;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.Command;
@@ -21,11 +19,22 @@ public class LastLoginCommand implements CommandExecutor {
 
     private final SimpleDateFormat dateFormat = new SimpleDateFormat(String.format("M-d-YY '%sat%s' hh:mma  ", ChatColor.GOLD, ChatColor.RED));
 
-    @Getter
-    @AllArgsConstructor
     private static class LoginData {
         private final String name;
         private final Long loginTime;
+
+        private LoginData(String name, Long loginTime) {
+            this.name = name;
+            this.loginTime = loginTime;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Long getLoginTime() {
+            return loginTime;
+        }
     }
 
     @Override
