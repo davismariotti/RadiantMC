@@ -1,0 +1,113 @@
+name: Release SurvivalConfig
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'SurvivalConfig/**'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Build without publishing a release'
+        type: boolean
+        default: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    outputs:
+      new-release-published: ${{ steps.release-check.outputs.new_release_published }}
+      new-release-version: ${{ steps.release-check.outputs.new_release_version }}
+      branches-config: ${{ steps.branches.outputs.config }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Detect open PR
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR_NUMBER=$(gh pr view --json number -q '.number' 2>/dev/null || echo "")
+          echo "number=$PR_NUMBER" >> "$GITHUB_OUTPUT"
+      - name: Build branches config
+        id: branches
+        env:
+          PR_NUMBER: ${{ steps.pr.outputs.number }}
+          REF_NAME: ${{ github.ref_name }}
+          RUN_NUMBER: ${{ github.run_number }}
+          RUN_ATTEMPT: ${{ github.run_attempt }}
+        run: |
+          if [ -n "$PR_NUMBER" ]; then
+            echo "config=[\"master\", {\"name\": \"${REF_NAME}\", \"channel\": \"next\", \"prerelease\": \"pr-${PR_NUMBER}.${RUN_NUMBER}.${RUN_ATTEMPT}\"}]" >> "$GITHUB_OUTPUT"
+          else
+            echo 'config=["master"]' >> "$GITHUB_OUTPUT"
+          fi
+      - id: release-check
+        uses: cycjimmy/semantic-release-action@v4
+        with:
+          working_directory: SurvivalConfig
+          dry_run: true
+          branches: ${{ steps.branches.outputs.config }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  build-frontend:
+    needs: release-check
+    if: needs.release-check.outputs.new-release-published == 'true'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SurvivalConfig
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: SurvivalConfig/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - name: Zip build
+        run: zip -r survivalconfig-build.zip build/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survivalconfig-build
+          path: SurvivalConfig/survivalconfig-build.zip
+          retention-days: 1
+
+  release:
+    needs: [release-check, build-frontend]
+    if: needs.release-check.outputs.new-release-published == 'true' && inputs.dry_run != true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: cycjimmy/semantic-release-action@v4
+        with:
+          working_directory: SurvivalConfig
+          branches: ${{ needs.release-check.outputs.branches-config }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/download-artifact@v4
+        with:
+          name: survivalconfig-build
+      - name: Attach build to release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release upload "survivalconfig-v${{ needs.release-check.outputs.new-release-version }}" survivalconfig-build.zip --clobber
