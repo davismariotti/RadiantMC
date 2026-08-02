@@ -56,5 +56,7 @@ public class RadiantMCPlugin extends JavaPlugin {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        getLogger().info(String.format("RadiantMCPlugin v%s enabled", getDescription().getVersion()));
     }
 }
