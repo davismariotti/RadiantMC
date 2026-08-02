@@ -1,0 +1,100 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      bukkitplugin: ${{ steps.filter.outputs.bukkitplugin }}
+      survivalapi: ${{ steps.filter.outputs.survivalapi }}
+      survivalconfig: ${{ steps.filter.outputs.survivalconfig }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            bukkitplugin:
+              - 'BukkitPlugin/**'
+            survivalapi:
+              - 'SurvivalAPI/**'
+            survivalconfig:
+              - 'SurvivalConfig/**'
+
+  bukkitplugin-ci:
+    needs: changes
+    if: needs.changes.outputs.bukkitplugin == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: BukkitPlugin
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+      - name: Compile
+        run: mvn -B compile
+      - name: Test
+        run: mvn -B test
+
+  survivalapi-ci:
+    needs: changes
+    if: needs.changes.outputs.survivalapi == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SurvivalAPI
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.9'
+          cache: 'pip'
+          cache-dependency-path: SurvivalAPI/requirements.txt
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+      - name: Compile check
+        run: python -m py_compile src/*.py
+      - name: Test
+        if: hashFiles('SurvivalAPI/tests/**') != ''
+        run: pip install pytest && pytest
+
+  survivalconfig-ci:
+    needs: changes
+    if: needs.changes.outputs.survivalconfig == 'true' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: SurvivalConfig
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'yarn'
+          cache-dependency-path: SurvivalConfig/yarn.lock
+      - run: yarn install --frozen-lockfile
+      - name: Build
+        run: yarn build
+      - name: Test
+        run: yarn test --watchAll=false
+
+  ci:
+    needs: [bukkitplugin-ci, survivalapi-ci, survivalconfig-ci]
+    if: always()
+    runs-on: ubuntu-latest
+    steps:
+      - name: All checks passed
+        run: |
+          if [[ "${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}" == "true" ]]; then
+            exit 1
+          fi

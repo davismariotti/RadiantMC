@@ -3,6 +3,8 @@ package com.davismariotti.radiantmc.commands;
 import com.davismariotti.radiantmc.data.DataFile;
 import com.google.inject.Inject;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.text.WordUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -75,8 +77,8 @@ public class NickCommand implements CommandExecutor {
         StringBuilder sb = new StringBuilder("That color is invalid. Available colors: ");
         for (ChatColor color : ChatColor.values()) {
             if (color == ChatColor.RESET) continue;
-            sb.append(color.toString());
+            sb.append(color).append(WordUtils.capitalizeFully(color.name())).append(ChatColor.RESET).append(", ");
         }
-        sender.sendMessage(sb.toString());
+        sender.sendMessage(StringUtils.substringBeforeLast(sb.toString(), ", "));
     }
 }
