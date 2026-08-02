@@ -7,6 +7,7 @@ import MainPage from './pages/main'
 import Navbar from './pages/navbar'
 import UsernamePage from './pages/username'
 import { CssBaseline, StyledEngineProvider } from '@mui/material'
+import packageJson from '../package.json'
 
 function App() {
   return (
@@ -19,6 +20,9 @@ function App() {
               <Navbar />
               <Route path="/" component={MainPage} exact />
               <Route path="/user/:id" component={UsernamePage} exact />
+              <div style={{ position: 'fixed', bottom: 4, right: 8, fontSize: 12, opacity: 0.5 }}>
+                v{packageJson.version}
+              </div>
             </div>
           </BrowserRouter>
         </ThemeProvider>
