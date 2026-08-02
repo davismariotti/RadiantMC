@@ -2,7 +2,6 @@ package com.davismariotti.radiantmc.listeners;
 
 import com.davismariotti.radiantmc.RadiantMCPlugin;
 import com.google.inject.Inject;
-import lombok.RequiredArgsConstructor;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.World;
@@ -13,10 +12,14 @@ import org.bukkit.event.entity.PlayerDeathEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class DeathListener implements Listener {
 
     private final RadiantMCPlugin plugin;
+
+    @Inject
+    public DeathListener(RadiantMCPlugin plugin) {
+        this.plugin = plugin;
+    }
 
     @EventHandler
     public void onDeath(PlayerDeathEvent event) {

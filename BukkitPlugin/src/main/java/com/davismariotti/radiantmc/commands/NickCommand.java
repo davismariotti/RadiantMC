@@ -2,7 +2,6 @@ package com.davismariotti.radiantmc.commands;
 
 import com.davismariotti.radiantmc.data.DataFile;
 import com.google.inject.Inject;
-import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.text.WordUtils;
 import org.bukkit.Bukkit;
@@ -13,10 +12,14 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
 
-@RequiredArgsConstructor(onConstructor_ = {@Inject})
 public class NickCommand implements CommandExecutor {
 
     private final DataFile dataFile;
+
+    @Inject
+    public NickCommand(DataFile dataFile) {
+        this.dataFile = dataFile;
+    }
 
     private boolean setChatColor(CommandSender sender, Player player, String color) {
         if (player == null) {

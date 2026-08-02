@@ -1,6 +1,7 @@
 package com.davismariotti.radiantmc.util;
 
 import com.davismariotti.radiantmc.RadiantMCPlugin;
+import com.davismariotti.radiantmc.dto.LoginApiResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Inject;
 import okhttp3.*;
@@ -24,7 +25,7 @@ public class LoginApiService {
         this.apiKey = plugin.getConfig().getString("text.apiKey");
     }
 
-    public void postPlayerLoggedIn(UUID playerName, List<UUID> loggedInPlayers) throws IOException {
+    public int postPlayerLoggedIn(UUID playerName, List<UUID> loggedInPlayers) throws IOException {
         LoggedInPayload payload = new LoggedInPayload();
         payload.excludedPlayers = loggedInPlayers;
         String json = mapper.writeValueAsString(payload);
@@ -37,11 +38,17 @@ public class LoginApiService {
                 .post(body)
                 .build();
 
+        int count = 0;
         try (Response response = httpClient.newCall(request).execute()) {
+            ResponseBody responseBody = response.body();
 
             if (!response.isSuccessful()) throw new IOException("Unexpected code " + response);
+
+            LoginApiResponse apiResponse = mapper.readValue(responseBody.string(), LoginApiResponse.class);
+            count = apiResponse.getPayload().size();
+
             System.out.println(Objects.requireNonNull(response.body()).string());
         }
-
+        return count;
     }
 }
